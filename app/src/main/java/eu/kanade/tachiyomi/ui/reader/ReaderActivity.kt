@@ -472,8 +472,7 @@ class ReaderActivity : BaseActivity() {
                 viewer?.Content(
                     modifier = Modifier
                         .fillMaxSize()
-                        .windowInsetsPadding(insets)
-                        .padding(bottom = 120.dp),
+                        .windowInsetsPadding(insets),
                 )
             }
         }
