@@ -35,6 +35,7 @@ fun ReaderBottomBar(
     onClickSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val palette = rememberVmhLectorPalette()
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -52,10 +53,10 @@ fun ReaderBottomBar(
                 imageVector = readingMode.icon,
                 contentDescription = stringResource(MR.strings.viewer),
                 modifier = Modifier.size(20.dp),
-                tint = VmhLectorTokens.LomoAzulClaro,
+                tint = palette.acento,
             )
         }
-        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(VmhLectorTokens.Separador))
+        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(palette.separador))
 
         Box(
             modifier = Modifier
@@ -68,10 +69,10 @@ fun ReaderBottomBar(
                 imageVector = orientation.icon,
                 contentDescription = stringResource(MR.strings.rotation_type),
                 modifier = Modifier.size(20.dp),
-                tint = VmhLectorTokens.LomoAzulClaro,
+                tint = palette.acento,
             )
         }
-        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(VmhLectorTokens.Separador))
+        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(palette.separador))
 
         Box(
             modifier = Modifier
@@ -89,9 +90,9 @@ fun ReaderBottomBar(
                 contentDescription = stringResource(MR.strings.pref_crop_borders),
                 modifier = Modifier.size(20.dp),
                 tint = if (cropEnabled) {
-                    VmhLectorTokens.CoralActivo
+                    palette.coralActivo
                 } else {
-                    VmhLectorTokens.LomoAzulClaro
+                    palette.acento
                 },
             )
             if (cropEnabled) {
@@ -100,11 +101,11 @@ fun ReaderBottomBar(
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .height(2.dp)
-                        .background(VmhLectorTokens.CoralActivo),
+                        .background(palette.coralActivo),
                 )
             }
         }
-        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(VmhLectorTokens.Separador))
+        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(palette.separador))
 
         Box(
             modifier = Modifier
@@ -117,7 +118,7 @@ fun ReaderBottomBar(
                 imageVector = CustomMaterialSymbols.Rounded.SettingsSliders,
                 contentDescription = stringResource(MR.strings.action_settings),
                 modifier = Modifier.size(20.dp),
-                tint = VmhLectorTokens.LomoAzulClaro,
+                tint = palette.acento,
             )
         }
     }

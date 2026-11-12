@@ -81,6 +81,7 @@ fun ReaderAppBars(
     onClickCropBorder: () -> Unit,
     onClickSettings: () -> Unit,
 ) {
+    val palette = rememberVmhLectorPalette()
     val backgroundColor = MaterialTheme.colorScheme
         .surfaceColorAtElevation(3.dp)
         .copy(alpha = if (isSystemInDarkTheme()) 0.9f else 0.95f)
@@ -167,11 +168,11 @@ fun ReaderAppBars(
                             .height(44.dp)
                             .shadow(12.dp, progressShape, clip = false)
                             .clip(progressShape)
-                            .background(VmhLectorTokens.LomoAzul)
-                            .border(1.dp, VmhLectorTokens.LomoAzulClaro, progressShape)
+                            .background(palette.superficie)
+                            .border(1.dp, palette.acento, progressShape)
                             .drawBehind {
                                 drawRect(
-                                    color = VmhLectorTokens.LomoAzulClaro,
+                                    color = palette.acento,
                                     size = Size(width = 4.dp.toPx(), height = size.height),
                                 )
                             },
@@ -197,11 +198,11 @@ fun ReaderAppBars(
                         .height(56.dp)
                         .shadow(12.dp, actionsShape, clip = false)
                         .clip(actionsShape)
-                        .background(VmhLectorTokens.LomoAzul)
-                        .border(1.dp, VmhLectorTokens.LomoAzulClaro, actionsShape)
+                        .background(palette.superficie)
+                        .border(1.dp, palette.acento, actionsShape)
                         .drawBehind {
                             drawRect(
-                                color = VmhLectorTokens.LomoAzulClaro,
+                                color = palette.acento,
                                 size = Size(width = 4.dp.toPx(), height = size.height),
                             )
                         },

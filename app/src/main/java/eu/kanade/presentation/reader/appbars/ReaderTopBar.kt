@@ -40,12 +40,6 @@ import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
 import java.util.Locale
 
-private val VmhLomoAzul = VmhLectorTokens.LomoAzul
-private val VmhLomoAzulClaro = VmhLectorTokens.LomoAzulClaro
-private val VmhTextoClaro = VmhLectorTokens.TextoClaro
-private val VmhCoralActivo = VmhLectorTokens.CoralActivo
-private val VmhIconoActivo = VmhLectorTokens.IconoActivo
-
 @Composable
 fun ReaderTopBar(
     mangaTitle: String?,
@@ -58,6 +52,7 @@ fun ReaderTopBar(
     onShare: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
+    val palette = rememberVmhLectorPalette()
     val hasChapterTitle = !chapterTitle.isNullOrBlank()
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -91,10 +86,10 @@ fun ReaderTopBar(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(VmhLomoAzul)
+            .background(palette.superficie)
             .drawBehind {
                 drawRect(
-                    color = VmhLomoAzulClaro,
+                    color = palette.acento,
                     size = Size(width = 4.dp.toPx(), height = size.height),
                 )
             }
@@ -115,7 +110,7 @@ fun ReaderTopBar(
                     imageVector = CustomMaterialSymbols.Rounded.Back,
                     contentDescription = stringResource(MR.strings.action_bar_up_description),
                     modifier = Modifier.size(24.dp),
-                    tint = VmhTextoClaro,
+                    tint = palette.texto,
                 )
             }
 
@@ -128,7 +123,7 @@ fun ReaderTopBar(
                     Text(
                         text = mangaTitle.uppercase(Locale.getDefault()),
                         style = MaterialTheme.typography.labelSmall,
-                        color = VmhLomoAzulClaro,
+                        color = palette.acento,
                         letterSpacing = 1.8.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -140,7 +135,7 @@ fun ReaderTopBar(
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = VmhTextoClaro,
+                    color = palette.texto,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.basicMarquee(),
@@ -151,8 +146,8 @@ fun ReaderTopBar(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (bookmarked) VmhCoralActivo else Color.Transparent)
-                    .border(1.dp, VmhLomoAzulClaro, RoundedCornerShape(10.dp)),
+                    .background(if (bookmarked) palette.coralActivo else Color.Transparent)
+                    .border(1.dp, palette.acento, RoundedCornerShape(10.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 IconButton(
@@ -169,7 +164,7 @@ fun ReaderTopBar(
                             if (bookmarked) MR.strings.action_remove_bookmark else MR.strings.action_bookmark,
                         ),
                         modifier = Modifier.size(22.dp),
-                        tint = if (bookmarked) VmhIconoActivo else VmhLomoAzulClaro,
+                        tint = if (bookmarked) palette.iconoActivo else palette.acento,
                     )
                 }
             }
@@ -183,7 +178,7 @@ fun ReaderTopBar(
                         imageVector = CustomMaterialSymbols.Rounded.MoreVert,
                         contentDescription = "Menú",
                         modifier = Modifier.size(22.dp),
-                        tint = VmhTextoClaro,
+                        tint = palette.texto,
                     )
                 }
 

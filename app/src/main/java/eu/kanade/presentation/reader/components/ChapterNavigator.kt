@@ -44,7 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import eu.kanade.presentation.reader.appbars.VmhLectorTokens
+import eu.kanade.presentation.reader.appbars.rememberVmhLectorPalette
 import eu.kanade.presentation.util.isTabletUi
 import mihon.icons.custommaterialsymbols.CustomMaterialSymbols
 import mihon.icons.custommaterialsymbols.rounded.ChapterNext
@@ -99,6 +99,7 @@ fun ChapterNavigator(
 
     val isTabletUi = isTabletUi()
     val mainAxisPadding = if (isTabletUi) 24.dp else 8.dp
+    val palette = rememberVmhLectorPalette()
     val buttonColor = IconButtonDefaults.filledIconButtonColors(
         containerColor = Color.Transparent,
         disabledContainerColor = Color.Transparent,
@@ -133,7 +134,7 @@ fun ChapterNavigator(
             onPageChangeFinished = onPageIndexChangeFinished,
             interactionSource = interactionSource,
             mainAxisPadding = mainAxisPadding,
-            backgroundColor = VmhLectorTokens.LomoAzul,
+            backgroundColor = palette.superficie,
             buttonColor = buttonColor,
             modifier = modifier,
         )
@@ -157,6 +158,7 @@ fun HorizontalChapterNavigator(
     modifier: Modifier = Modifier,
 ) {
     val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+    val palette = rememberVmhLectorPalette()
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(
@@ -177,7 +179,7 @@ fun HorizontalChapterNavigator(
                         if (isRtl) MR.strings.action_next_chapter else MR.strings.action_previous_chapter,
                     ),
                     modifier = Modifier.size(20.dp),
-                    tint = VmhLectorTokens.LomoAzulClaro.copy(
+                    tint = palette.acento.copy(
                         alpha = if (if (isRtl) enabledNext else enabledPrevious) 1f else 0.38f,
                     ),
                 )
@@ -199,12 +201,12 @@ fun HorizontalChapterNavigator(
                         Box(
                             modifier = Modifier.fillMaxWidth().height(
                                 1.dp,
-                            ).background(VmhLectorTokens.ProgresoPista),
+                            ).background(palette.progresoPista),
                         )
                         Box(
                             modifier = Modifier.fillMaxWidth(
                                 fraction,
-                            ).height(3.dp).background(VmhLectorTokens.ProgresoActivo),
+                            ).height(3.dp).background(palette.progresoActivo),
                         )
 
                         Slider(
@@ -219,7 +221,7 @@ fun HorizontalChapterNavigator(
                                         width = 4.dp,
                                         height = 16.dp,
                                     ).background(
-                                        color = VmhLectorTokens.ProgresoActivo,
+                                        color = palette.progresoActivo,
                                         shape = RoundedCornerShape(2.dp),
                                     ),
                                 )
@@ -243,7 +245,7 @@ fun HorizontalChapterNavigator(
                         if (isRtl) MR.strings.action_previous_chapter else MR.strings.action_next_chapter,
                     ),
                     modifier = Modifier.size(20.dp),
-                    tint = VmhLectorTokens.LomoAzulClaro.copy(
+                    tint = palette.acento.copy(
                         alpha = if (if (isRtl) enabledPrevious else enabledNext) 1f else 0.38f,
                     ),
                 )
@@ -252,7 +254,7 @@ fun HorizontalChapterNavigator(
             Text(
                 text = "$currentPage / $totalPages",
                 style = MaterialTheme.typography.labelSmall,
-                color = VmhLectorTokens.TextoClaro,
+                color = palette.texto,
                 textAlign = TextAlign.End,
                 modifier = Modifier.width(44.dp),
             )
