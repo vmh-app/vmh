@@ -174,10 +174,7 @@ fun ReaderTopBar(
                 }
             }
 
-            Row(
-                modifier = Modifier.padding(start = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+            Box {
                 IconButton(
                     onClick = { menuExpanded = true },
                     modifier = Modifier.size(48.dp),
@@ -189,19 +186,13 @@ fun ReaderTopBar(
                         tint = VmhTextoClaro,
                     )
                 }
-                Text(
-                    text = "Menú",
-                    color = VmhTextoClaro,
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(end = 4.dp),
+
+                ReaderOverflowMenu(
+                    actions = overflowActions,
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false },
                 )
             }
-
-            ReaderOverflowMenu(
-                actions = overflowActions,
-                expanded = menuExpanded,
-                onDismissRequest = { menuExpanded = false },
-            )
         }
     }
 }
