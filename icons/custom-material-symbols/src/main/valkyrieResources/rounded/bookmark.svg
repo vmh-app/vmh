@@ -1,3 +1,8 @@
+<!--
+  VMH 'bookmark': pestana de pagina metida en el lomo, saliente en horizontal con punta.
+  NADA de la cinta vertical con muesca en V de Material Symbols. Lenguaje visual "Lomo".
+  SPDX-License-Identifier: Apache-2.0
+-->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 3H18V21L12 16.5L6 21Z"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4.5 3V21 M4.5 8.5H16.5L19.5 12L16.5 15.5H4.5"/>
 </svg>

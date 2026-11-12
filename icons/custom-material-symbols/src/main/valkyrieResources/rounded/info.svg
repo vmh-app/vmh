@@ -1,3 +1,9 @@
+<!--
+  VMH 'info': signo de interrogacion en la columna vertebral de un libro cerrado.
+  NADA de la "i" en circulo de Material Symbols. Lenguaje visual "Lomo".
+  SPDX-License-Identifier: Apache-2.0
+-->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18Z M12 11v5 M12 7.5h0"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 4H19V20H5 M8 4V20"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M11.3 9.2C11.3 7.9 12.4 6.9 13.7 6.9C15 6.9 16.1 7.9 16.1 9.2C16.1 10.5 15 11.2 13.7 12V13.5 M13.7 16.3H13.7"/>
 </svg>

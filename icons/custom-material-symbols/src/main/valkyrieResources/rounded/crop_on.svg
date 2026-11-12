@@ -1,3 +1,8 @@
+<!--
+  VMH 'crop_on': escuadras en "L" asimetricas (brazos de distinta longitud) mas la linea de
+  columna vertebral del libro. Misma familia que 'crop_off'. Lenguaje visual "Lomo".
+  SPDX-License-Identifier: Apache-2.0
+-->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M8 3H3V8 M16 3H21V8 M3 16V21H8 M21 16V21H16"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 8V3H9 M15 3H21V9 M21 16V21H15 M9 21H3V16 M12 4.5V19.5"/>
 </svg>

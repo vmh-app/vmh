@@ -1,6 +1,9 @@
 <!--
-  VMH 'crop_off': las mismas dos escuadras de crop_on cruzadas por un tajo de 1.8.
-  Geometria original del rediseño de VMH (lenguaje "margenes de libro").
+  VMH 'crop_off': las mismas escuadras en "L" asimetricas y la columna vertebral de 'crop_on',
+  con un tajo diagonal que dice que el recorte esta apagado. Misma familia, mismo trazo.
+  Lenguaje visual "Lomo".
   SPDX-License-Identifier: Apache-2.0
 -->
-<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M2 6H18V7.8H2ZM6 2H7.8V18H6ZM6 16.2H22V18H6ZM16.2 6H18V22H16.2ZM3.6 2.3L21.7 20.4L20.4 21.7L2.3 3.6Z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 8V3H9 M15 3H21V9 M21 16V21H15 M9 21H3V16 M12 4.5V19.5 M5.5 18.5L18.5 5.5"/>
+</svg>

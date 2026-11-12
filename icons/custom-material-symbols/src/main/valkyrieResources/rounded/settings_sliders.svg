@@ -1,3 +1,9 @@
+<!--
+  VMH 'settings_sliders': columna de lomo con tres perillas asomando por su borde derecho.
+  NADA de lineas horizontales con perillas. Lenguaje visual "Lomo".
+  SPDX-License-Identifier: Apache-2.0
+-->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 6H21 M3 12H21 M3 18H18 M8 4V8 M16 10V14 M10 16V20"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 3.5H7V20.5H4Z M7 7H13 M7 12H15 M7 17H13"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14.5 7A1.5 1.5 0 1 1 14.5 10A1.5 1.5 0 1 1 14.5 7Z M16.5 12A1.5 1.5 0 1 1 16.5 15A1.5 1.5 0 1 1 16.5 12Z M14.5 17A1.5 1.5 0 1 1 14.5 20A1.5 1.5 0 1 1 14.5 17Z"/>
 </svg>

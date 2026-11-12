@@ -83,7 +83,11 @@ class ReaderPreferences(
 
     val zoomStart: Preference<Int> = preferenceStore.getInt("pref_zoom_start_key", 1)
 
-    val readerTheme: Preference<Int> = preferenceStore.getInt("pref_reader_theme_key", 1)
+    /**
+     * Background of the reader pages. Defaults to AUTOMATIC (3), which follows the app theme:
+     * black in a dark app, white in a light app. The owner decided this on 2026-11-11.
+     */
+    val readerTheme: Preference<Int> = preferenceStore.getInt("pref_reader_theme_key", 3)
 
     val alwaysShowChapterTransition: Preference<Boolean> = preferenceStore.getBoolean(
         "always_show_chapter_transition",

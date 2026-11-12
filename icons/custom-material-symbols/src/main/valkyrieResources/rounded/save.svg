@@ -1,3 +1,8 @@
+<!--
+  VMH 'save': lomo con borde inclinado y una guarda (banda) que cruza el libro cerrado.
+  NADA de la disquetera de Material Symbols. Lenguaje visual "Lomo".
+  SPDX-License-Identifier: Apache-2.0
+-->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 3H20V21H4Z M8 3V8H16V3 M8 14H16V21"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 3H20V21H4Z M5.1 10H20 M4.6 13.5H20"/>
 </svg>

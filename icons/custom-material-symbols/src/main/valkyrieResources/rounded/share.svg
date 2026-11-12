@@ -1,3 +1,9 @@
+<!--
+  VMH 'share': libro abierto del que una hoja sale hacia arriba a la derecha, sin tocarse.
+  NADA del triangulo de tres nodos con barras de Material Symbols. Lenguaje visual "Lomo".
+  SPDX-License-Identifier: Apache-2.0
+-->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M18 3A2 2 0 1 1 18 7A2 2 0 1 1 18 3Z M6 10A2 2 0 1 1 6 14A2 2 0 1 1 6 10Z M18 17A2 2 0 1 1 18 21A2 2 0 1 1 18 17Z M7.7 10.8L16.3 6.2 M7.7 13.2L16.3 17.8"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 5C5.5 4.5 8 5.5 10 7.5V18C8 16 5.5 15 3 15.5Z M10 7.5C11.5 6 13 5.3 14.5 5.3"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 9.5L16.5 5L20.5 5.5L20 10.5 M20.5 5.5L17 9"/>
 </svg>

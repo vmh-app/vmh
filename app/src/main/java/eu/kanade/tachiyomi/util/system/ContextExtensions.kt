@@ -98,18 +98,37 @@ fun Context.createFileInCacheDir(name: String): File {
     return file
 }
 
-private val ReaderGrayBackgroundColor = Color.rgb(0x20, 0x21, 0x25)
-
 /**
  * Background color of the reader for the given [readerTheme].
  *
- * Automatic resolves against the current night mode, matching the activity background.
+ * WHITE and BLACK use pure colors. GRAY keeps the reader's gray background.
+ * AUTOMATIC resolves to black at night and white during the day.
+ *
+ * AUTOMATIC follows the APP theme mode, not the system night mode. The system night mode and the
+ * app theme mode are different things: the app can be forced to dark while the device is in light
+ * mode. Resolving AUTOMATIC from [isNightMode] therefore painted the reader white inside a dark
+ * app. The resolution here mirrors [createReaderThemeContext] so both agree.
  */
 fun Context.readerBackgroundColor(readerTheme: ReaderPreferences.ReaderTheme): Int = when (readerTheme) {
     ReaderPreferences.ReaderTheme.WHITE -> Color.WHITE
     ReaderPreferences.ReaderTheme.BLACK -> Color.BLACK
-    ReaderPreferences.ReaderTheme.GRAY -> ReaderGrayBackgroundColor
-    ReaderPreferences.ReaderTheme.AUTOMATIC -> if (isNightMode()) ReaderGrayBackgroundColor else Color.WHITE
+    ReaderPreferences.ReaderTheme.GRAY -> Color.parseColor("#202125")
+    ReaderPreferences.ReaderTheme.AUTOMATIC -> if (isReaderNightMode()) Color.BLACK else Color.WHITE
+}
+
+/**
+ * Whether the reader must render its automatic background as dark.
+ *
+ * Mirrors the resolution in [createReaderThemeContext]: SYSTEM follows the device, the explicit
+ * DARK and LIGHT modes follow the app.
+ */
+private fun Context.isReaderNightMode(): Boolean {
+    val themeMode = appGraph.uiPreferences.themeMode.get()
+    return when (themeMode) {
+        ThemeMode.SYSTEM -> applicationContext.isNightMode()
+        ThemeMode.DARK -> true
+        ThemeMode.LIGHT -> false
+    }
 }
 
 /**
