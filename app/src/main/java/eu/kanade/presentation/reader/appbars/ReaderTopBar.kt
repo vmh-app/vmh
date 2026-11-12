@@ -40,11 +40,11 @@ import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
 import java.util.Locale
 
-private val VmhLomoAzul = Color(0xFF0B1F3A)
-private val VmhLomoAzulClaro = Color(0xFF8AB4FF)
-private val VmhTextoClaro = Color(0xFFF7F9FF)
-private val VmhCoralActivo = Color(0xFFFF8A70)
-private val VmhIconoActivo = Color(0xFF06214F)
+private val VmhLomoAzul = VmhLectorTokens.LomoAzul
+private val VmhLomoAzulClaro = VmhLectorTokens.LomoAzulClaro
+private val VmhTextoClaro = VmhLectorTokens.TextoClaro
+private val VmhCoralActivo = VmhLectorTokens.CoralActivo
+private val VmhIconoActivo = VmhLectorTokens.IconoActivo
 
 @Composable
 fun ReaderTopBar(
