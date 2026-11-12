@@ -33,9 +33,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
@@ -170,12 +168,7 @@ fun ReaderAppBars(
                             .clip(progressShape)
                             .background(palette.superficie)
                             .border(1.dp, palette.acento, progressShape)
-                            .drawBehind {
-                                drawRect(
-                                    color = palette.acento,
-                                    size = Size(width = 4.dp.toPx(), height = size.height),
-                                )
-                            },
+                            .fileteLomo(radio = 22.dp, color = palette.acento),
                     ) {
                         ChapterNavigator(
                             type = chapterNavigatorType,
@@ -200,12 +193,7 @@ fun ReaderAppBars(
                         .clip(actionsShape)
                         .background(palette.superficie)
                         .border(1.dp, palette.acento, actionsShape)
-                        .drawBehind {
-                            drawRect(
-                                color = palette.acento,
-                                size = Size(width = 4.dp.toPx(), height = size.height),
-                            )
-                        },
+                        .fileteLomo(radio = 28.dp, color = palette.acento),
                 ) {
                     ReaderBottomBar(
                         readingMode = readingMode,

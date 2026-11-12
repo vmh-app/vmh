@@ -4,8 +4,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /**
  * Tokens de identidad visual del lector de VMH.
@@ -110,5 +118,56 @@ fun rememberVmhLectorPalette(): VmhLectorPalette {
             separador = Color(0x33000000),
             progresoPista = colorScheme.onSurface.copy(alpha = 0.18f),
         )
+    }
+}
+
+/**
+ * Filete vertical de acento pegado al borde izquierdo de un contenedor redondeado.
+ *
+ * No se puede usar `drawRect`: el rectángulo es recto y sobresale por fuera de la curva de la
+ * `RoundedCornerShape`, dejando el borde cortado a la izquierda. Medido en la capsula de acciones:
+ * el filete arrancaba 3 px antes del borde real de la tinta.
+ *
+ * Aqui el filete se dibuja con un path de esquinas redondeadas del mismo radio que el contenedor y
+ * se recorta a la franja izquierda, de modo que la punta del filete sigue la curva del redondeo y
+ * nunca la invade.
+ *
+ * @param radio radio de esquina en dp; debe ser el mismo que usa el `border` del contenedor.
+ * @param color color del filete.
+ * @param grosor ancho del filete en dp.
+ * @param bordeBorde ancho en dp de la linea de `border` del contenedor; el filete se dibuja por
+ *   dentro de ella, porque Compose dibuja esa linea centrada en el perimetro y su mitad exterior
+ *   sobresaldria hacia la izquierda.
+ */
+fun Modifier.fileteLomo(
+    radio: Dp,
+    color: Color,
+    grosor: Dp = 4.dp,
+    bordeBorde: Dp = 1.dp,
+) = drawBehind {
+    val r = radio.toPx()
+    // Path de la forma completa: el recorte a la franja izquierda se queda con el borde redondeado
+    // real del contenedor, en vez de un rectángulo recto que sobresale de la curva.
+    val path = Path().apply {
+        addRoundRect(
+            RoundRect(
+                left = 0f,
+                top = 0f,
+                right = size.width,
+                bottom = size.height,
+                cornerRadius = CornerRadius(r, r),
+            ),
+        )
+    }
+    // El `border` de Compose es centrado: su mitad exterior ocupa medio ancho de linea por fuera.
+    // El filete arranca despues de esa mitad, para quedar pegado al borde y no invadirlo.
+    val arranque = bordeBorde.toPx() / 2f
+    clipRect(
+        left = arranque,
+        top = 0f,
+        right = arranque + grosor.toPx(),
+        bottom = size.height,
+    ) {
+        drawPath(path, color)
     }
 }

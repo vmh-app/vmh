@@ -1,7 +1,6 @@
 package eu.kanade.presentation.reader.settings
 
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,8 +16,6 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
 import eu.kanade.tachiyomi.ui.reader.viewer.webgpu.WebGpuViewerSettings
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.CheckboxItem
-import tachiyomi.presentation.core.components.HeadingItem
-import tachiyomi.presentation.core.components.SettingsChipRow
 import tachiyomi.presentation.core.components.SliderItem
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.collectAsState
@@ -32,12 +29,12 @@ internal fun ColumnScope.ReadingModePage(viewModel: ReaderSettingsViewModel) {
         return
     }
 
-    HeadingItem(MR.strings.pref_category_for_this_series)
+    VmhSeccionTitulo(MR.strings.pref_category_for_this_series)
     val manga by viewModel.mangaFlow.collectAsState()
     val readingMode = remember(manga) { ReadingMode.fromPreference(manga?.readingMode?.toInt()) }
-    SettingsChipRow(MR.strings.pref_category_reading_mode) {
+    VmhChipRow(MR.strings.pref_category_reading_mode) {
         ReadingMode.entries.map {
-            FilterChip(
+            VmhChip(
                 selected = it == readingMode,
                 onClick = { viewModel.setReadingMode(it) },
                 label = { Text(stringResource(it.stringRes)) },
@@ -46,9 +43,9 @@ internal fun ColumnScope.ReadingModePage(viewModel: ReaderSettingsViewModel) {
     }
 
     val orientation = remember(manga) { ReaderOrientation.fromPreference(manga?.readerOrientation?.toInt()) }
-    SettingsChipRow(MR.strings.rotation_type) {
+    VmhChipRow(MR.strings.rotation_type) {
         ReaderOrientation.entries.map {
-            FilterChip(
+            VmhChip(
                 selected = it == orientation,
                 onClick = { viewModel.setOrientation(it) },
                 label = { Text(stringResource(it.stringRes)) },
@@ -66,7 +63,7 @@ internal fun ColumnScope.ReadingModePage(viewModel: ReaderSettingsViewModel) {
 
 @Composable
 private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) {
-    HeadingItem(MR.strings.pager_viewer)
+    VmhSeccionTitulo(MR.strings.pager_viewer)
 
     val navigationModePager by viewModel.preferences.navigationModePager.collectAsState()
     val pagerNavInverted by viewModel.preferences.pagerNavInverted.collectAsState()
@@ -78,9 +75,9 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
     )
 
     val imageScaleType by viewModel.preferences.imageScaleType.collectAsState()
-    SettingsChipRow(MR.strings.pref_image_scale_type) {
+    VmhChipRow(MR.strings.pref_image_scale_type) {
         ReaderPreferences.ImageScaleType.mapIndexed { index, it ->
-            FilterChip(
+            VmhChip(
                 selected = imageScaleType == index + 1,
                 onClick = { viewModel.preferences.imageScaleType.set(index + 1) },
                 label = { Text(stringResource(it)) },
@@ -89,9 +86,9 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
     }
 
     val zoomStart by viewModel.preferences.zoomStart.collectAsState()
-    SettingsChipRow(MR.strings.pref_zoom_start) {
+    VmhChipRow(MR.strings.pref_zoom_start) {
         ReaderPreferences.ZoomStart.mapIndexed { index, it ->
-            FilterChip(
+            VmhChip(
                 selected = zoomStart == index + 1,
                 onClick = { viewModel.preferences.zoomStart.set(index + 1) },
                 label = { Text(stringResource(it)) },
@@ -145,7 +142,7 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
 private fun ColumnScope.WebtoonViewerSettings(viewModel: ReaderSettingsViewModel) {
     val numberFormat = remember { NumberFormat.getPercentInstance() }
 
-    HeadingItem(MR.strings.webtoon_viewer)
+    VmhSeccionTitulo(MR.strings.webtoon_viewer)
 
     val navigationModeWebtoon by viewModel.preferences.navigationModeWebtoon.collectAsState()
     val webtoonNavInverted by viewModel.preferences.webtoonNavInverted.collectAsState()
@@ -216,9 +213,9 @@ internal fun TapZonesItems(
     invertMode: ReaderPreferences.TappingInvertMode,
     onSelectInvertMode: (ReaderPreferences.TappingInvertMode) -> Unit,
 ) {
-    SettingsChipRow(MR.strings.pref_viewer_nav) {
+    VmhChipRow(MR.strings.pref_viewer_nav) {
         ReaderPreferences.TapZones.mapIndexed { index, it ->
-            FilterChip(
+            VmhChip(
                 selected = selected == index,
                 onClick = { onSelect(index) },
                 label = { Text(stringResource(it)) },
@@ -227,9 +224,9 @@ internal fun TapZonesItems(
     }
 
     if (selected != 5) {
-        SettingsChipRow(MR.strings.pref_read_with_tapping_inverted) {
+        VmhChipRow(MR.strings.pref_read_with_tapping_inverted) {
             ReaderPreferences.TappingInvertMode.entries.map {
-                FilterChip(
+                VmhChip(
                     selected = it == invertMode,
                     onClick = { onSelectInvertMode(it) },
                     label = { Text(stringResource(it.titleRes)) },

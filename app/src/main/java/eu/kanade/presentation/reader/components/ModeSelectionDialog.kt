@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -17,9 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import eu.kanade.presentation.reader.appbars.rememberVmhLectorPalette
 import eu.kanade.presentation.theme.TachiyomiPreviewTheme
-import mihon.icons.materialsymbols.MaterialSymbols
-import mihon.icons.materialsymbols.rounded.Check
+import mihon.icons.custommaterialsymbols.CustomMaterialSymbols
+import mihon.icons.custommaterialsymbols.rounded.Check
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.SettingsItemsPaddings
 import tachiyomi.presentation.core.components.material.padding
@@ -31,6 +32,7 @@ fun ModeSelectionDialog(
     onUseDefault: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
+    val palette = rememberVmhLectorPalette()
     Box(modifier = Modifier.padding(vertical = 16.dp)) {
         Column {
             content()
@@ -50,13 +52,17 @@ fun ModeSelectionDialog(
 
                 FilledTonalButton(
                     onClick = onApply,
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = palette.superficie,
+                        contentColor = palette.texto,
+                    ),
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            imageVector = MaterialSymbols.Rounded.Check,
+                            imageVector = CustomMaterialSymbols.Rounded.Check,
                             contentDescription = null,
                         )
                         Text(text = stringResource(MR.strings.action_apply))

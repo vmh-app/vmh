@@ -1,8 +1,10 @@
 package eu.kanade.presentation.reader
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -12,16 +14,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
 import eu.kanade.domain.manga.model.readerOrientation
 import eu.kanade.presentation.components.AdaptiveSheet
 import eu.kanade.presentation.reader.components.ModeSelectionDialog
+import eu.kanade.presentation.reader.settings.VmhIconToggleButton
+import eu.kanade.presentation.reader.settings.VmhSeccionTitulo
 import eu.kanade.presentation.theme.TachiyomiPreviewTheme
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderOrientation
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsViewModel
 import tachiyomi.i18n.MR
-import tachiyomi.presentation.core.components.SettingsIconGrid
-import tachiyomi.presentation.core.components.material.IconToggleButton
 import tachiyomi.presentation.core.i18n.stringResource
 
 private val ReaderOrientationsWithoutDefault = ReaderOrientation.entries - ReaderOrientation.DEFAULT
@@ -62,17 +65,22 @@ private fun DialogContent(
         }.takeIf { orientation != ReaderOrientation.DEFAULT },
         onApply = { onChangeOrientation(selected) },
     ) {
-        SettingsIconGrid(MR.strings.rotation_type) {
-            items(ReaderOrientationsWithoutDefault) { mode ->
-                IconToggleButton(
-                    checked = mode == selected,
-                    onCheckedChange = {
-                        selected = mode
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    imageVector = mode.icon,
-                    title = stringResource(mode.stringRes),
-                )
+        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+            VmhSeccionTitulo(MR.strings.rotation_type)
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ReaderOrientationsWithoutDefault.forEach { mode ->
+                    VmhIconToggleButton(
+                        checked = mode == selected,
+                        onCheckedChange = { selected = mode },
+                        modifier = Modifier.weight(1f),
+                        imageVector = mode.icon,
+                        title = stringResource(mode.stringRes),
+                    )
+                }
             }
         }
     }

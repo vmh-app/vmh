@@ -2,7 +2,6 @@ package eu.kanade.presentation.reader.settings
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,7 +12,6 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
 import eu.kanade.tachiyomi.util.system.hasDisplayCutout
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.CheckboxItem
-import tachiyomi.presentation.core.components.SettingsChipRow
 import tachiyomi.presentation.core.components.SliderItem
 import tachiyomi.presentation.core.i18n.pluralStringResource
 import tachiyomi.presentation.core.i18n.stringResource
@@ -47,9 +45,9 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
     val flashColorPref = viewModel.preferences.flashColor
     val flashColor by flashColorPref.collectAsState()
 
-    SettingsChipRow(MR.strings.pref_reader_theme) {
+    VmhChipRow(MR.strings.pref_reader_theme) {
         themes.map { (labelRes, value) ->
-            FilterChip(
+            VmhChip(
                 selected = readerTheme == value,
                 onClick = { viewModel.preferences.readerTheme.set(value) },
                 label = { Text(stringResource(labelRes)) },
@@ -64,9 +62,9 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
 
     val verticalNavigatorModes by viewModel.preferences.verticalNavigator.collectAsState()
 
-    SettingsChipRow(MR.strings.pref_vertical_navigator) {
+    VmhChipRow(MR.strings.pref_vertical_navigator) {
         ReadingMode.entries.filter { it != ReadingMode.DEFAULT }.forEach { mode ->
-            FilterChip(
+            VmhChip(
                 selected = verticalNavigatorModes.contains(mode),
                 onClick = {
                     val newModes = if (verticalNavigatorModes.contains(mode)) {
@@ -155,9 +153,9 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
             },
             pillColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         )
-        SettingsChipRow(MR.strings.pref_flash_with) {
+        VmhChipRow(MR.strings.pref_flash_with) {
             flashColors.map { (labelRes, value) ->
-                FilterChip(
+                VmhChip(
                     selected = flashColor == value,
                     onClick = { flashColorPref.set(value) },
                     label = { Text(stringResource(labelRes)) },

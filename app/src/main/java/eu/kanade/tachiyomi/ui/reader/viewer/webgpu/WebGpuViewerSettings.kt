@@ -11,7 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,17 +42,18 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import logcat.LogPriority
-import mihon.icons.materialsymbols.MaterialSymbols
-import mihon.icons.materialsymbols.rounded.Add
-import mihon.icons.materialsymbols.rounded.Delete
-import mihon.icons.materialsymbols.rounded.DragHandle
+import mihon.icons.custommaterialsymbols.CustomMaterialSymbols
+import mihon.icons.custommaterialsymbols.rounded.Add
+import mihon.icons.custommaterialsymbols.rounded.Delete
+import mihon.icons.custommaterialsymbols.rounded.DragHandle
 import sh.calvin.reorderable.ReorderableColumn
 import tachiyomi.core.common.preference.Preference
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
+import eu.kanade.presentation.reader.settings.VmhChip
+import eu.kanade.presentation.reader.settings.VmhChipRow
+import eu.kanade.presentation.reader.settings.VmhSeccionTitulo
 import tachiyomi.presentation.core.components.CheckboxItem
-import tachiyomi.presentation.core.components.HeadingItem
-import tachiyomi.presentation.core.components.SettingsChipRow
 import tachiyomi.presentation.core.components.SettingsItemsPaddings
 import tachiyomi.presentation.core.components.SliderItem
 import tachiyomi.presentation.core.components.material.padding
@@ -63,13 +63,13 @@ import java.text.NumberFormat
 
 @Composable
 internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
-    HeadingItem(MR.strings.pref_category_for_this_series)
+    VmhSeccionTitulo(MR.strings.pref_category_for_this_series)
     val manga by viewModel.mangaFlow.collectAsState()
 
     val readingMode = remember(manga) { ReadingMode.fromPreference(manga?.readingMode?.toInt()) }
-    SettingsChipRow(MR.strings.pref_category_reading_mode) {
+    VmhChipRow(MR.strings.pref_category_reading_mode) {
         ReadingMode.entries.map {
-            FilterChip(
+            VmhChip(
                 selected = it == readingMode,
                 onClick = { viewModel.setReadingMode(it) },
                 label = { Text(stringResource(it.stringRes)) },
@@ -80,9 +80,9 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
     val resolved by viewModel.readingMode.collectAsState()
     val dualPageView by viewModel.preferences.dualPageView.collectAsState()
     if (resolved == ReadingMode.LEFT_TO_RIGHT || resolved == ReadingMode.RIGHT_TO_LEFT) {
-        SettingsChipRow(MR.strings.pref_dual_page_view) {
+        VmhChipRow(MR.strings.pref_dual_page_view) {
             ReaderPreferences.DualPageView.entries.map {
-                FilterChip(
+                VmhChip(
                     selected = it == dualPageView,
                     onClick = { viewModel.preferences.dualPageView.set(it) },
                     label = { Text(stringResource(it.titleRes)) },
@@ -126,9 +126,9 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
     }
 
     val orientation = remember(manga) { ReaderOrientation.fromPreference(manga?.readerOrientation?.toInt()) }
-    SettingsChipRow(MR.strings.rotation_type) {
+    VmhChipRow(MR.strings.rotation_type) {
         ReaderOrientation.entries.forEach {
-            FilterChip(
+            VmhChip(
                 selected = it == orientation,
                 onClick = { viewModel.setOrientation(it) },
                 label = { Text(stringResource(it.stringRes)) },
@@ -136,7 +136,7 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
         }
     }
 
-    HeadingItem(MR.strings.webgpu_viewer)
+    VmhSeccionTitulo(MR.strings.webgpu_viewer)
 
     // As the viewer decides it, with the activity's window in place of the viewer's size. Not the sheet's own window.
     val configuration = LocalConfiguration.current
@@ -158,12 +158,12 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
 
     if (isDual) {
         val transitionAnimation by viewModel.preferences.transitionAnimationDual.collectAsState()
-        SettingsChipRow(MR.strings.pref_transition_animation_dual) {
+        VmhChipRow(MR.strings.pref_transition_animation_dual) {
             (
                 ReaderPreferences.TransitionAnimation.entries - ReaderPreferences.TransitionAnimation.FLIP_LEFT -
                     ReaderPreferences.TransitionAnimation.FLIP_RIGHT
                 ).forEach {
-                FilterChip(
+                VmhChip(
                     selected = it == transitionAnimation,
                     onClick = { viewModel.preferences.transitionAnimationDual.set(it) },
                     label = { Text(stringResource(it.titleRes)) },
@@ -171,9 +171,9 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
             }
         }
         val cutoutMode by viewModel.preferences.cutoutModeDual.collectAsState()
-        SettingsChipRow(MR.strings.pref_cutout_mode_dual) {
+        VmhChipRow(MR.strings.pref_cutout_mode_dual) {
             ReaderPreferences.CutoutMode.entries.forEach {
-                FilterChip(
+                VmhChip(
                     selected = it == cutoutMode,
                     onClick = { viewModel.preferences.cutoutModeDual.set(it) },
                     label = { Text(stringResource(it.titleRes)) },
@@ -185,9 +185,9 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
 
     if (resolved != ReadingMode.WEBTOON && resolved != ReadingMode.CONTINUOUS_VERTICAL) {
         val imageScaleType by viewModel.preferences.imageScaleType.collectAsState()
-        SettingsChipRow(MR.strings.pref_image_scale_type) {
+        VmhChipRow(MR.strings.pref_image_scale_type) {
             ReaderPreferences.ImageScaleTypeWebGpuViewer.forEach {
-                FilterChip(
+                VmhChip(
                     selected = ReaderPreferences.ImageScaleType[imageScaleType - 1] == it,
                     onClick = {
                         viewModel.preferences.imageScaleType.set(ReaderPreferences.ImageScaleType.indexOf(it) + 1)
@@ -198,9 +198,9 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
         }
 
         val zoomStart by viewModel.preferences.zoomStart.collectAsState()
-        SettingsChipRow(MR.strings.pref_zoom_start) {
+        VmhChipRow(MR.strings.pref_zoom_start) {
             ReaderPreferences.ZoomStart.mapIndexed { index, it ->
-                FilterChip(
+                VmhChip(
                     selected = zoomStart == index + 1,
                     onClick = { viewModel.preferences.zoomStart.set(index + 1) },
                     label = { Text(stringResource(it)) },
@@ -229,9 +229,9 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
         )
 
         val transitionAnimation by viewModel.preferences.transitionAnimation.collectAsState()
-        SettingsChipRow(MR.strings.pref_transition_animation) {
+        VmhChipRow(MR.strings.pref_transition_animation) {
             ReaderPreferences.TransitionAnimation.entries.forEach {
-                FilterChip(
+                VmhChip(
                     selected = it == transitionAnimation,
                     onClick = { viewModel.preferences.transitionAnimation.set(it) },
                     label = { Text(stringResource(it.titleRes)) },
@@ -240,9 +240,9 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
         }
 
         val cutoutMode by viewModel.preferences.cutoutMode.collectAsState()
-        SettingsChipRow(MR.strings.pref_cutout_mode) {
+        VmhChipRow(MR.strings.pref_cutout_mode) {
             ReaderPreferences.CutoutMode.entries.forEach {
-                FilterChip(
+                VmhChip(
                     selected = it == cutoutMode,
                     onClick = { viewModel.preferences.cutoutMode.set(it) },
                     label = { Text(stringResource(it.titleRes)) },
@@ -301,7 +301,7 @@ private fun ShaderList(labelRes: StringResource, pref: Preference<List<WebGpuSha
         )
     }
 
-    HeadingItem(labelRes)
+    VmhSeccionTitulo(labelRes)
     ReorderableColumn(
         list = filters,
         onSettle = { from, to ->
@@ -323,7 +323,7 @@ private fun ShaderList(labelRes: StringResource, pref: Preference<List<WebGpuSha
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        imageVector = MaterialSymbols.Rounded.DragHandle,
+                        imageVector = CustomMaterialSymbols.Rounded.DragHandle,
                         contentDescription = null,
                         modifier = Modifier.draggableHandle(),
                     )
@@ -339,7 +339,7 @@ private fun ShaderList(labelRes: StringResource, pref: Preference<List<WebGpuSha
                         onClick = { WebGpuShaders.remove(context, pref, shader) },
                     ) {
                         Icon(
-                            imageVector = MaterialSymbols.Rounded.Delete,
+                            imageVector = CustomMaterialSymbols.Rounded.Delete,
                             contentDescription = stringResource(MR.strings.action_delete),
                         )
                     }
@@ -357,7 +357,7 @@ private fun ShaderList(labelRes: StringResource, pref: Preference<List<WebGpuSha
         },
         modifier = Modifier.padding(horizontal = SettingsItemsPaddings.Horizontal - MaterialTheme.padding.small),
     ) {
-        Icon(imageVector = MaterialSymbols.Rounded.Add, contentDescription = null)
+        Icon(imageVector = CustomMaterialSymbols.Rounded.Add, contentDescription = null)
         Text(
             text = stringResource(MR.strings.action_add_shader),
             modifier = Modifier.padding(start = MaterialTheme.padding.small),
