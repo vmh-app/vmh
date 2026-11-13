@@ -55,7 +55,6 @@ abstract class SearchViewModel(
     protected val pinnedSources = sourcePreferences.pinnedSources.get()
 
     private var lastQuery: String? = null
-    private var lastSourceFilter: SourceFilter? = null
 
     protected var extensionFilter: String? = null
 
@@ -115,26 +114,19 @@ abstract class SearchViewModel(
         state.update { it.copy(searchQuery = query) }
     }
 
-    fun setSourceFilter(filter: SourceFilter) {
-        state.update { it.copy(sourceFilter = filter) }
-        search()
-    }
-
     fun toggleFilterResults() {
         preferences.globalSearchFilterState.toggle()
     }
 
     fun search() {
         val query = state.value.searchQuery
-        val sourceFilter = state.value.sourceFilter
 
         if (query.isNullOrBlank()) return
 
         val sameQuery = this.lastQuery == query
-        if (sameQuery && this.lastSourceFilter == sourceFilter) return
+        if (sameQuery) return
 
         this.lastQuery = query
-        this.lastSourceFilter = sourceFilter
 
         searchJob?.cancel()
 
@@ -218,7 +210,6 @@ abstract class SearchViewModel(
     data class State(
         val from: Manga? = null,
         val searchQuery: String? = null,
-        val sourceFilter: SourceFilter = SourceFilter.PinnedOnly,
         val onlyShowHasResults: Boolean = false,
         val items: Map<Source, SearchItemResult> = mapOf(),
         val dialog: Dialog? = null,
@@ -231,11 +222,6 @@ abstract class SearchViewModel(
     sealed interface Dialog {
         data class Migrate(val target: Manga, val current: Manga) : Dialog
     }
-}
-
-enum class SourceFilter {
-    All,
-    PinnedOnly,
 }
 
 sealed interface SearchItemResult {
