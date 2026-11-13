@@ -12,7 +12,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogWindowProvider
-import eu.kanade.presentation.components.TabbedDialog
 import eu.kanade.presentation.components.TabbedDialogPaddings
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsViewModel
 import tachiyomi.i18n.MR
@@ -33,7 +32,7 @@ fun ReaderSettingsDialog(
     val pagerState = rememberPagerState { tabTitles.size }
 
     BoxWithConstraints {
-        TabbedDialog(
+        VmhTabbedDialog(
             modifier = Modifier.heightIn(max = maxHeight * 0.75f),
             onDismissRequest = {
                 onDismissRequest()
