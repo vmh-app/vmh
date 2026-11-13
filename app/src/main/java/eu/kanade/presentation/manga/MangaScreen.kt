@@ -55,6 +55,7 @@ import eu.kanade.presentation.manga.components.MangaChapterListItem
 import eu.kanade.presentation.manga.components.MangaInfoBox
 import eu.kanade.presentation.manga.components.MangaToolbar
 import eu.kanade.presentation.manga.components.MissingChapterCountListItem
+import eu.kanade.presentation.manga.components.VmhCapsulaAccion
 import eu.kanade.presentation.util.formatChapterNumber
 import eu.kanade.tachiyomi.data.download.model.Download
 import eu.kanade.tachiyomi.source.getNameForMangaInfo
@@ -271,6 +272,10 @@ private fun MangaScreenSmallImpl(
         )
     }
 
+    val readCount = remember(chapters) { chapters.count { it.chapter.read } }
+    val totalCount = chapters.size
+    val hasStarted = readCount > 0
+
     BackHandler(enabled = isAnySelected) {
         onAllChapterSelected(false)
     }
@@ -324,17 +329,12 @@ private fun MangaScreenSmallImpl(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             val isFABVisible = state.hasUnreadChapters && !isAnySelected
-            SmallExtendedFloatingActionButton(
-                text = {
-                    Text(
-                        text = stringResource(
-                            if (state.hasReadChapters) MR.strings.action_resume else MR.strings.action_start,
-                        ),
-                    )
-                },
-                icon = { Icon(imageVector = MaterialSymbols.RoundedFilled.PlayArrow, contentDescription = null) },
+            VmhCapsulaAccion(
+                texto = stringResource(
+                    if (state.hasReadChapters) MR.strings.action_resume else MR.strings.action_start,
+                ),
+                icono = MaterialSymbols.RoundedFilled.PlayArrow,
                 onClick = onContinueReading,
-                expanded = chapterListState.shouldExpandFAB(),
                 modifier = Modifier.animateFloatingActionButton(
                     visible = isFABVisible,
                     alignment = Alignment.BottomEnd,
@@ -389,6 +389,8 @@ private fun MangaScreenSmallImpl(
                             trackingCount = state.trackingCount,
                             nextUpdate = nextUpdate,
                             isUserIntervalMode = state.manga.fetchInterval < 0,
+                            hasStarted = hasStarted,
+                            onContinueReadingClicked = onContinueReading,
                             onAddToLibraryClicked = onAddToLibraryClicked,
                             onWebViewClicked = onWebViewClicked,
                             onWebViewLongClicked = onWebViewLongClicked,
@@ -421,6 +423,8 @@ private fun MangaScreenSmallImpl(
                             enabled = !isAnySelected,
                             chapterCount = chapters.size,
                             missingChapterCount = state.missingChapterCount,
+                            readCount = readCount,
+                            totalCount = totalCount,
                             onClick = onFilterClicked,
                         )
                     }
@@ -504,6 +508,10 @@ fun MangaScreenLargeImpl(
         )
     }
 
+    val readCount = remember(chapters) { chapters.count { it.chapter.read } }
+    val totalCount = chapters.size
+    val hasStarted = readCount > 0
+
     val insetPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal).asPaddingValues()
     var topBarHeight by remember { mutableIntStateOf(0) }
 
@@ -554,17 +562,12 @@ fun MangaScreenLargeImpl(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             val isFABVisible = state.hasUnreadChapters && !isAnySelected
-            SmallExtendedFloatingActionButton(
-                text = {
-                    Text(
-                        text = stringResource(
-                            if (state.hasReadChapters) MR.strings.action_resume else MR.strings.action_start,
-                        ),
-                    )
-                },
-                icon = { Icon(imageVector = MaterialSymbols.RoundedFilled.PlayArrow, contentDescription = null) },
+            VmhCapsulaAccion(
+                texto = stringResource(
+                    if (state.hasReadChapters) MR.strings.action_resume else MR.strings.action_start,
+                ),
+                icono = MaterialSymbols.RoundedFilled.PlayArrow,
                 onClick = onContinueReading,
-                expanded = chapterListState.shouldExpandFAB(),
                 modifier = Modifier.animateFloatingActionButton(
                     visible = isFABVisible,
                     alignment = Alignment.BottomEnd,
@@ -607,6 +610,8 @@ fun MangaScreenLargeImpl(
                             trackingCount = state.trackingCount,
                             nextUpdate = nextUpdate,
                             isUserIntervalMode = state.manga.fetchInterval < 0,
+                            hasStarted = hasStarted,
+                            onContinueReadingClicked = onContinueReading,
                             onAddToLibraryClicked = onAddToLibraryClicked,
                             onWebViewClicked = onWebViewClicked,
                             onWebViewLongClicked = onWebViewLongClicked,
@@ -646,6 +651,8 @@ fun MangaScreenLargeImpl(
                                     enabled = !isAnySelected,
                                     chapterCount = chapters.size,
                                     missingChapterCount = state.missingChapterCount,
+                                    readCount = readCount,
+                                    totalCount = totalCount,
                                     onClick = onFilterButtonClicked,
                                 )
                             }

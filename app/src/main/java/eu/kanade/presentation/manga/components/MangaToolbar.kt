@@ -49,20 +49,17 @@ fun MangaToolbar(
     modifier: Modifier = Modifier,
 ) {
     val isActionMode = actionModeCounter > 0
-    AppBar(
-        titleContent = {
-            if (isActionMode) {
-                AppBarTitle(actionModeCounter.toString())
-            } else {
-                AppBarTitle(title, modifier = Modifier.alpha(titleAlphaProvider()))
-            }
-        },
+    // Barra de marca de VMH: superficie de color primario con filete de acento abajo. Es fija, no
+    // aparece al hacer scroll como en Mihon, para que el titulo de la serie nunca quede sobre la
+    // imagen de portada. Por eso el titulo va siempre visible: `titleAlphaProvider` mide el
+    // desvanecimiento de la barra de Mihon, que aqui no aplica.
+    VmhBarraMarca(
         modifier = modifier,
-        backgroundColor = MaterialTheme.colorScheme
-            .surfaceColorAtElevation(3.dp)
-            .copy(alpha = if (isActionMode) 1f else backgroundAlphaProvider()),
-        navigateUp = navigateUp,
-        actions = {
+        titulo = if (isActionMode) actionModeCounter.toString() else title,
+        mostrarTitulo = true,
+        onNavigateUp = navigateUp,
+        onCancelActionMode = onCancelActionMode,
+        contenidoAcciones = {
             var downloadExpanded by remember { mutableStateOf(false) }
             if (onClickDownload != null) {
                 val onDismissRequest = { downloadExpanded = false }
@@ -88,7 +85,7 @@ fun MangaToolbar(
                             AppBar.Action(
                                 title = stringResource(MR.strings.action_select_inverse),
                                 icon = MaterialSymbols.Rounded.FlipToBack,
-                                onClick = onInvertSelection,
+                                onClick = { onInvertSelection() },
                             ),
                         )
                         return@buildList
@@ -149,7 +146,5 @@ fun MangaToolbar(
                 },
             )
         },
-        isActionMode = isActionMode,
-        onCancelActionMode = onCancelActionMode,
     )
 }

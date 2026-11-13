@@ -6,12 +6,13 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -124,20 +125,35 @@ fun rememberVmhLectorPalette(): VmhLectorPalette {
 /**
  * Filete vertical de acento pegado al borde izquierdo de un contenedor redondeado.
  *
- * No se puede usar `drawRect`: el rectángulo es recto y sobresale por fuera de la curva de la
+ * El filete es un **trazo (stroke)** sobre el perimetro redondeado del contenedor, recortado a
+ * la mitad izquierda. Ese trazo tiene grosor constante y recorre las dos esquinas de ese lado,
+ * asi que la curva se lee limpia de punta a punta.
+ *
+ * **Por que no una franja vertical rellena.** La version anterior dibujaba el path completo y lo
+ * recortaba con `clipRect` a una franja vertical de ancho constante. Medido en la captura real de
+ * la capsula de progreso: el ancho del acento caia de 12 px a 4 px al entrar en la esquina y
+ * saltaba de golpe al salir de ella. El resultado era una **columna recta de ancho completo** en
+ * el tramo recto del lado izquierdo, separada del arco, que se leia como una barra pegada al
+ * borde y no como parte de la curva. Un stroke no tiene ese escalon.
+ *
+ * **Por que el path es solo del lado izquierdo.** Dibujar el perimetro completo y recortarlo con
+ * `clipRect` dejaba pasar tambien el trazo del borde **horizontal** de la capsula, y ese trazo se
+ * sumaba al arco en las esquinas. Medido: el grosor horizontal del acento iba de 7 px en el tramo
+ * recto a 11 px en la esquina y 26 px en la punta del arco. Las esquinas se veian de distinto
+ * peso que el centro: el filete «disparejo». Con un path que recorre solo la izquierda (arco
+ * superior + tramo recto + arco inferior), el trazo es una sola linea continua de grosor igual.
+ *
+ * **Por que no `drawRect`.** El rectángulo es recto y sobresale por fuera de la curva de la
  * `RoundedCornerShape`, dejando el borde cortado a la izquierda. Medido en la capsula de acciones:
  * el filete arrancaba 3 px antes del borde real de la tinta.
- *
- * Aqui el filete se dibuja con un path de esquinas redondeadas del mismo radio que el contenedor y
- * se recorta a la franja izquierda, de modo que la punta del filete sigue la curva del redondeo y
- * nunca la invade.
  *
  * @param radio radio de esquina en dp; debe ser el mismo que usa el `border` del contenedor.
  * @param color color del filete.
  * @param grosor ancho del filete en dp.
- * @param bordeBorde ancho en dp de la linea de `border` del contenedor; el filete se dibuja por
- *   dentro de ella, porque Compose dibuja esa linea centrada en el perimetro y su mitad exterior
- *   sobresaldria hacia la izquierda.
+ * @param bordeBorde ancho en dp de la linea de `border` del contenedor. Compose dibuja esa linea
+ *   centrada en el perimetro, con la mitad exterior por fuera del layout; el filete se dibuja
+ *   desplazado la misma mitad hacia afuera, para que el borde quede por dentro y el filete por
+ *   fuera, sin invadir la superficie.
  */
 fun Modifier.fileteLomo(
     radio: Dp,
@@ -146,28 +162,76 @@ fun Modifier.fileteLomo(
     bordeBorde: Dp = 1.dp,
 ) = drawBehind {
     val r = radio.toPx()
-    // Path de la forma completa: el recorte a la franja izquierda se queda con el borde redondeado
-    // real del contenedor, en vez de un rectángulo recto que sobresale de la curva.
-    val path = Path().apply {
-        addRoundRect(
-            RoundRect(
-                left = 0f,
-                top = 0f,
-                right = size.width,
-                bottom = size.height,
-                cornerRadius = CornerRadius(r, r),
+    // El filete es un TRAZO (stroke) sobre el perimetro redondeado del contenedor, no una franja
+    // vertical rellena.
+    // Un stroke tiene grosor constante y sigue la curva de punta a punta; una franja
+    // vertical recortada dejaba una columna recta de ancho completo en el tramo recto del
+    // lado izquierdo, que se leia como una barra pegada y no como parte de la curva.
+    //
+    // El `border` de Compose es centrado en el perimetro: ocupa media linea por dentro y media
+    // por fuera. Para que el filete quede pegado al borde SIN taparlo, su trazo se apoya sobre
+    // la mitad interior del `border`: el path del filete se desplaza hacia adentro la mitad
+    // del grosor del borde y reduce su radio en la misma medida, de modo que el filete corre
+    // justo por dentro de la linea, sin invadir la superficie ni quedar por fuera del limite.
+    val dentroBorde = bordeBorde.toPx() / 2f
+    val radioFilete = (r - dentroBorde).coerceAtLeast(0f)
+
+    // Path del SOLO lado izquierdo: arco superior + tramo recto + arco inferior, unidos.
+    //
+    // No se recorta el perimetro completo con un `clipRect`: el recorte dejaba pasar tambien el
+    // trazo del borde HORIZONTAL de la capsula, y ese trazo se sumaba al arco en las esquinas.
+    // Medido en la captura real: el grosor horizontal del acento pasaba de 7 px en el tramo
+    // recto a 11 px en la esquina, y a 26 px en la punta del arco. Las dos esquinas se veian de
+    // distinto peso que el centro: el filete «disparejo».
+    //
+    // Con este path el trazo corre solo por la izquierda: la curva de una sola linea continua,
+    // de grosor igual en todo su recorrido.
+    val trazo = Path().apply {
+        // Geometria EXACTA (simulada y medida antes de portar a Kotlin):
+        //   centro del arco superior = (d, d), radio = r - d
+        //   centro del arco inferior = (d, alto - d), radio = r - d
+        //   el tramo recto vertical corre en x = d
+        // En Android los angulos crecen en sentido horario: 0 = este, 90 = sur (abajo),
+        // 180 = oeste, 270 = norte (arriba).
+        //
+        // Arco superior: de A = (rf, d) (angulo 270 del centro) a B = (d, rf) (angulo 180),
+        // pasando por arriba-izquierda: sweep = -90.
+        moveTo(radioFilete, dentroBorde)
+        arcTo(
+            rect = Rect(
+                left = dentroBorde,
+                top = dentroBorde,
+                right = dentroBorde + radioFilete * 2f,
+                bottom = dentroBorde + radioFilete * 2f,
             ),
+            startAngleDegrees = 270f,
+            sweepAngleDegrees = -90f,
+            forceMoveTo = false,
+        )
+        // Tramo recto vertical del lado izquierdo: de B = (d, rf) a C = (d, alto - rf).
+        lineTo(dentroBorde, size.height - radioFilete)
+        // Arco inferior: de C (angulo 180 del centro inferior) a D = (rf, alto - d) (angulo 90),
+        // pasando por abajo-izquierda: sweep = -90.
+        arcTo(
+            rect = Rect(
+                left = dentroBorde,
+                top = size.height - dentroBorde - radioFilete * 2f,
+                right = dentroBorde + radioFilete * 2f,
+                bottom = size.height - dentroBorde,
+            ),
+            startAngleDegrees = 180f,
+            sweepAngleDegrees = -90f,
+            forceMoveTo = false,
         )
     }
-    // El `border` de Compose es centrado: su mitad exterior ocupa medio ancho de linea por fuera.
-    // El filete arranca despues de esa mitad, para quedar pegado al borde y no invadirlo.
-    val arranque = bordeBorde.toPx() / 2f
-    clipRect(
-        left = arranque,
-        top = 0f,
-        right = arranque + grosor.toPx(),
-        bottom = size.height,
-    ) {
-        drawPath(path, color)
-    }
+
+    drawPath(
+        path = trazo,
+        color = color,
+        style = Stroke(
+            width = grosor.toPx(),
+            cap = StrokeCap.Round,
+            join = StrokeJoin.Round,
+        ),
+    )
 }
