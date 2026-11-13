@@ -416,35 +416,34 @@ private fun MangaAndSourceTitlesSmall(
         // La portada lleva el filete Lomo en el borde izquierdo, como las demas superficies de
         // marca de VMH.
         //
-        // Va envuelta en un `Box` porque `MangaCover.Book` aplica su propio `.clip(shape)` al
-        // `AsyncImage`: si el filete se encadenara en el modificador de la portada, ese clip lo
-        // recortaria por completo (medido en b41: la portada mostraba solo 1 px de borde y
-        // ningun filete). En el `Box` exterior el filete se dibuja DESPUES del contenido.
-        Box(
+        // El filete se pasa como parametro `filete` de `MangaCover.Book`: el componente mueve
+        // su `.clip(shape)` al `Box` contenedor y dibuja el filete como **ultimo hijo**, de modo
+        // que el trazo queda por encima de la imagen y recortado con la misma forma.
+        // Medido en b48: un overlay por fuera del componente no aparecia (0 px en 520), porque
+        // el trazo se dibujaba en el perimetro de una caja distinta al de la imagen.
+        MangaCover.Book(
             modifier = Modifier
                 .sizeIn(maxWidth = 100.dp)
                 .align(Alignment.Top),
-        ) {
-            MangaCover.Book(
-                modifier = Modifier.fillMaxWidth(),
-                data = ImageRequest.Builder(LocalContext.current)
-                    .data(manga)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = stringResource(MR.strings.manga_cover),
-                onClick = onCoverClick,
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .fileteLomoEncima(
-                        radio = 10.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        grosor = 3.dp,
-                        bordeBorde = 1.dp,
-                    ),
-            )
-        }
+            data = ImageRequest.Builder(LocalContext.current)
+                .data(manga)
+                .crossfade(true)
+                .build(),
+            contentDescription = stringResource(MR.strings.manga_cover),
+            onClick = onCoverClick,
+            filete = {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .fileteLomoEncima(
+                            radio = 10.dp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            grosor = 3.dp,
+                            bordeBorde = 0.dp,
+                        ),
+                )
+            },
+        )
         Column(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
