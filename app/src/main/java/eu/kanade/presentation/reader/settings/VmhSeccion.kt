@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,10 +39,10 @@ import java.util.Locale
 /**
  * Identidad visual de las secciones del dialogo del lector (VMH).
  *
- * Mismo lenguaje que la barra superior del lector: superficie azul tinta con filete vertical
- * de acento, texto en mayusculas con tracking. Los chips seleccionados se pintan de la
- * superficie de marca con texto de alto contraste; los no seleccionados llevan borde de acento
- * y fondo neutro, para que la seccion pertenezca a la app y no al material por defecto.
+ * Mismo lenguaje que la barra superior del lector: filete vertical de acento, texto en mayusculas
+ * con tracking. Los chips seleccionados llevan relleno de acento al 14 % con borde de acento; los
+ * inactivos quedan neutros del tema, para que la seccion pertenezca a la app y no al material por
+ * defecto.
  */
 private val vmhChipShape = RoundedCornerShape(8.dp)
 
@@ -138,7 +139,7 @@ fun VmhChip(
             .border(borderWidth, borderColor, vmhChipShape)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        androidx.compose.material3.ProvideTextStyle(
+        ProvideTextStyle(
             MaterialTheme.typography.labelMedium.copy(
                 color = textColor,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,

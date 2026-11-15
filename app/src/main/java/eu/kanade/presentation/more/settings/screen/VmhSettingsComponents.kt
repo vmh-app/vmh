@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -33,40 +32,20 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import eu.kanade.presentation.more.settings.Preference
-import eu.kanade.tachiyomi.ui.reader.setting.ReaderOrientation
-import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
-import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
-import eu.kanade.tachiyomi.util.system.hasDisplayCutout
-import mihon.app.di.appGraph
-import tachiyomi.core.common.i18n.pluralStringResource
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.VmhSliderThumb
 import tachiyomi.presentation.core.components.material.VmhSliderTrack
-import tachiyomi.presentation.core.i18n.pluralStringResource
-import tachiyomi.presentation.core.i18n.stringResource
-import tachiyomi.presentation.core.util.collectAsState
-import java.text.NumberFormat
 
-// Componentes compartidos por las pantallas de Ajustes de VMH.
-
-// Componentes compartidos por las pantallas de Ajustes de VMH.
-// Viven aqui para que cada pantalla no los redeclare (las clases top-level
-// chocan entre archivos del mismo paquete).
+// Piezas compartidas por las pantallas de Ajustes de VMH. Viven aqui para que cada pantalla no
+// las redeclare (las clases top-level chocan entre archivos del mismo paquete).
 
 internal data class ListDialogData<T>(
     val title: String,
@@ -240,7 +219,13 @@ internal fun VmhSliderPreference(
             steps = steps,
             trackRange = sliderRange,
         )
-        sliderState.value = value.toFloat()
+        // El estado se sincroniza en un efecto y no durante el dibujado: escribir el valor del
+        // slider en la fase de composicion hace que el control pelee con el arrastre.
+        LaunchedEffect(value) {
+            if (sliderState.value != value.toFloat()) {
+                sliderState.value = value.toFloat()
+            }
+        }
         Slider(
             state = sliderState,
             onValueChange = { onValueChange(it.toInt()) },

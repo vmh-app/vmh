@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
  * Tokens de identidad visual del lector de VMH.
  *
  * Una sola fuente de verdad para la barra superior y las dos capsulas flotantes inferiores.
- * Antes cada pieza definiia sus colores por separado y las capsulas salian en gris neutro
+ * Antes cada pieza definía sus colores por separado y las capsulas salian en gris neutro
  * (`MaterialTheme.colorScheme.surfaceContainer`), sin ninguna relacion con la barra superior.
  *
  * El patron de la barra superior es:
@@ -162,30 +162,11 @@ fun Modifier.fileteLomo(
     bordeBorde: Dp = 1.dp,
 ) = drawBehind {
     val r = radio.toPx()
-    // El filete es un TRAZO (stroke) sobre el perimetro redondeado del contenedor, no una franja
-    // vertical rellena.
-    // Un stroke tiene grosor constante y sigue la curva de punta a punta; una franja
-    // vertical recortada dejaba una columna recta de ancho completo en el tramo recto del
-    // lado izquierdo, que se leia como una barra pegada y no como parte de la curva.
-    //
-    // El `border` de Compose es centrado en el perimetro: ocupa media linea por dentro y media
-    // por fuera. Para que el filete quede pegado al borde SIN taparlo, su trazo se apoya sobre
-    // la mitad interior del `border`: el path del filete se desplaza hacia adentro la mitad
-    // del grosor del borde y reduce su radio en la misma medida, de modo que el filete corre
-    // justo por dentro de la linea, sin invadir la superficie ni quedar por fuera del limite.
+    // El `border` de Compose se dibuja centrado en el perimetro: el filete se corre hacia adentro
+    // la mitad de ese grosor para apoyarse justo por dentro de la linea.
     val dentroBorde = bordeBorde.toPx() / 2f
     val radioFilete = (r - dentroBorde).coerceAtLeast(0f)
 
-    // Path del SOLO lado izquierdo: arco superior + tramo recto + arco inferior, unidos.
-    //
-    // No se recorta el perimetro completo con un `clipRect`: el recorte dejaba pasar tambien el
-    // trazo del borde HORIZONTAL de la capsula, y ese trazo se sumaba al arco en las esquinas.
-    // Medido en la captura real: el grosor horizontal del acento pasaba de 7 px en el tramo
-    // recto a 11 px en la esquina, y a 26 px en la punta del arco. Las dos esquinas se veian de
-    // distinto peso que el centro: el filete «disparejo».
-    //
-    // Con este path el trazo corre solo por la izquierda: la curva de una sola linea continua,
-    // de grosor igual en todo su recorrido.
     val trazo = Path().apply {
         // Geometria EXACTA (simulada y medida antes de portar a Kotlin):
         //   centro del arco superior = (d, d), radio = r - d

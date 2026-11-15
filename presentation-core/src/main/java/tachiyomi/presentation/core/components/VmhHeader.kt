@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -83,7 +84,7 @@ fun VmhEyebrow(
 }
 
 /**
- * Contador en pastilla con borde ámbar. Reemplaza a la pastilla rellena de Mihon.
+ * Contador en pastilla con borde del acento. Reemplaza a la pastilla rellena de Mihon.
  */
 @Composable
 fun VmhCountPill(
@@ -203,7 +204,7 @@ fun VmhSectionTitle(
 }
 
 /**
- * Tarjeta de contenido de VMH: superficie elevada con borde cálido y radio grande.
+ * Tarjeta de contenido de VMH: superficie del tema, borde tenue y radio grande.
  */
 @Composable
 fun VmhCard(
@@ -253,7 +254,7 @@ fun VmhMetaPill(
 @Composable
 fun VmhMetaRow(
     modifier: Modifier = Modifier,
-    content: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit,
+    content: @Composable RowScope.() -> Unit,
 ) {
     Row(
         modifier = modifier,
