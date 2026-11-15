@@ -15,3 +15,14 @@ local.properties
 
 # macOS specific files
 .DS_Store
+
+# Local work files (screenshots, build logs, JVM crash dumps)
+/*.png
+/*.log
+/*.pid
+/hs_err_pid*.log
+/_MANIFIESTO.txt
+/build_apk*
+/capturas-mihon/
+/capturas-mihon2/
+/ui*.xml
