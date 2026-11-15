@@ -169,7 +169,7 @@ object AboutScreen : Screen() {
                         VmhTextPreference(
                             title = stringResource(MR.strings.website),
                             onClick = {
-                                uriHandler.openUri("https://vmh-extensions.gestevezmurillo.workers.dev")
+                                uriHandler.openUri("https://github.com/vmh-app/vmh")
                             },
                         )
                     }
