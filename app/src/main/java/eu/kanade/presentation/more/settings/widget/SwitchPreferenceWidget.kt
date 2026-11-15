@@ -35,8 +35,8 @@ fun SwitchPreferenceWidget(
                 onCheckedChange = null,
                 enabled = enabled,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.tertiary,
-                    checkedTrackColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f),
+                    checkedThumbColor = MaterialTheme.colorScheme.primary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
                 ),
                 modifier = Modifier.padding(start = TrailingWidgetBuffer),
             )

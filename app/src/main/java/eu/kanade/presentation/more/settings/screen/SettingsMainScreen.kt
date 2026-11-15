@@ -201,7 +201,9 @@ object SettingsMainScreen : Screen() {
             onClick = onClick,
             shape = RoundedCornerShape(20.dp),
             color = bgColor,
-            modifier = modifier.height(116.dp),
+            // 136 dp para que quepan titulo de dos lineas y resumen de tres: con 116 dp y una
+            // sola linea el resumen salia cortado ("Colores de la interfaz y for...").
+            modifier = modifier.height(136.dp),
         ) {
             Column(
                 modifier = Modifier.padding(14.dp),
@@ -230,7 +232,7 @@ object SettingsMainScreen : Screen() {
                             text = subtitle,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
+                            maxLines = 3,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }

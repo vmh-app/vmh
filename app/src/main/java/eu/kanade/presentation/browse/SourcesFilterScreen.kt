@@ -144,8 +144,8 @@ private fun SourcesFilterHeader(
             checked = enabled,
             onCheckedChange = { onClickItem(language) },
             colors = SwitchDefaults.colors(
-                checkedThumbColor = colors.tertiary,
-                checkedTrackColor = colors.tertiary.copy(alpha = 0.5f),
+                checkedThumbColor = colors.primary,
+                checkedTrackColor = colors.primary.copy(alpha = 0.35f),
             ),
         )
     }

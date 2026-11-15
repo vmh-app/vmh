@@ -176,9 +176,11 @@ internal fun VmhSwitchPreference(
         Switch(
             checked = checked,
             onCheckedChange = null,
+            // El interruptor va en el acento de la marca: con `tertiary` salia verde menta,
+            // un color que no aparece en ninguna otra parte de VMH.
             colors = SwitchDefaults.colors(
-                checkedThumbColor = MaterialTheme.colorScheme.tertiary,
-                checkedTrackColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f),
+                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
             ),
         )
     }
