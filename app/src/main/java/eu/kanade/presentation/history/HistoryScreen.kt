@@ -1,23 +1,49 @@
 package eu.kanade.presentation.history
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import eu.kanade.domain.ui.UiPreferences
-import eu.kanade.presentation.components.AppBar
-import eu.kanade.presentation.components.AppBarActions
-import eu.kanade.presentation.components.AppBarTitle
-import eu.kanade.presentation.components.SearchToolbar
+import eu.kanade.presentation.components.VmhBackCircle
+import eu.kanade.presentation.components.VmhCircleAction
+import eu.kanade.presentation.components.VmhSearchField
 import eu.kanade.presentation.components.relativeDateText
 import eu.kanade.presentation.history.components.HistoryItem
 import eu.kanade.presentation.theme.TachiyomiPreviewTheme
@@ -27,13 +53,16 @@ import kotlinx.datetime.LocalDate
 import mihon.app.di.appGraph
 import mihon.icons.materialsymbols.MaterialSymbols
 import mihon.icons.materialsymbols.rounded.DeleteSweep
+import mihon.icons.materialsymbols.rounded.Schedule
+import mihon.icons.materialsymbols.rounded.Search
 import tachiyomi.domain.history.model.HistoryWithRelations
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.FastScrollLazyColumn
-import tachiyomi.presentation.core.components.ListGroupHeader
+import tachiyomi.presentation.core.components.VmhScreenHeader
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
-import tachiyomi.presentation.core.screens.EmptyScreen
+import tachiyomi.presentation.core.screens.EmptyArt
+import tachiyomi.presentation.core.screens.EmptyMascot
 import tachiyomi.presentation.core.screens.LoadingScreen
 import tachiyomi.presentation.core.util.collectAsState
 
@@ -48,25 +77,11 @@ fun HistoryScreen(
     onDialogChange: (HistoryViewModel.Dialog?) -> Unit,
 ) {
     Scaffold(
-        topBar = { scrollBehavior ->
-            SearchToolbar(
-                titleContent = { AppBarTitle(stringResource(MR.strings.history)) },
+        topBar = {
+            VmhHistoryHeader(
                 searchQuery = state.searchQuery,
-                onChangeSearchQuery = onSearchQueryChange,
-                actions = {
-                    AppBarActions(
-                        listOf(
-                            AppBar.Action(
-                                title = stringResource(MR.strings.pref_clear_history),
-                                icon = MaterialSymbols.Rounded.DeleteSweep,
-                                onClick = {
-                                    onDialogChange(HistoryViewModel.Dialog.DeleteAll)
-                                },
-                            ),
-                        ),
-                    )
-                },
-                scrollBehavior = scrollBehavior,
+                onSearchQueryChange = onSearchQueryChange,
+                onClearHistory = { onDialogChange(HistoryViewModel.Dialog.DeleteAll) },
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -80,8 +95,9 @@ fun HistoryScreen(
                 } else {
                     MR.strings.information_no_recent_manga
                 }
-                EmptyScreen(
-                    stringRes = msg,
+                VmhHistoryEmpty(
+                    text = stringResource(msg),
+                    art = if (!state.searchQuery.isNullOrEmpty()) EmptyArt.SEARCH else EmptyArt.SLEEP,
                     modifier = Modifier.padding(contentPadding),
                 )
             } else {
@@ -95,6 +111,126 @@ fun HistoryScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun VmhHistoryHeader(
+    searchQuery: String?,
+    onSearchQueryChange: (String?) -> Unit,
+    onClearHistory: () -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    var searching by remember { mutableStateOf(searchQuery != null) }
+
+    LaunchedEffect(searchQuery) {
+        if (searchQuery == null) {
+            searching = false
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colors.surface)
+            .statusBarsPadding(),
+    ) {
+        Row(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (searching) {
+                VmhSearchField(
+                    query = searchQuery.orEmpty(),
+                    onQueryChange = onSearchQueryChange,
+                    onSearch = {},
+                    modifier = Modifier.weight(1f),
+                    placeholderRes = MR.strings.vmh_history_search_hint,
+                    autoFocus = true,
+                )
+            } else {
+                VmhScreenHeader(
+                    eyebrow = stringResource(MR.strings.app_name),
+                    title = stringResource(MR.strings.history),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
+            Spacer(Modifier.width(8.dp))
+
+            if (searching) {
+                VmhBackCircle(onClick = { onSearchQueryChange(null) })
+            } else {
+                VmhCircleAction(
+                    icon = MaterialSymbols.Rounded.Search,
+                    contentDescription = stringResource(MR.strings.action_search),
+                    onClick = { searching = true },
+                )
+                Spacer(Modifier.width(8.dp))
+                VmhCircleAction(
+                    icon = MaterialSymbols.Rounded.DeleteSweep,
+                    contentDescription = stringResource(MR.strings.pref_clear_history),
+                    onClick = onClearHistory,
+                )
+            }
+        }
+
+        HorizontalDivider(color = colors.outlineVariant)
+    }
+}
+
+@Composable
+private fun VmhHistoryEmpty(
+    text: String,
+    art: EmptyArt,
+    modifier: Modifier = Modifier,
+) {
+    val colors = MaterialTheme.colorScheme
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 40.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        EmptyMascot(art = art, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(18.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            color = colors.onSurface,
+        )
+    }
+}
+
+@Composable
+private fun VmhHistoryDayHeader(text: String) {
+    val colors = MaterialTheme.colorScheme
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = text.uppercase(),
+            style = MaterialTheme.typography.labelSmall.copy(
+                letterSpacing = 2.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+            color = colors.primary,
+        )
+        Spacer(Modifier.width(10.dp))
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(1.dp)
+                .background(colors.outlineVariant.copy(alpha = 0.7f)),
+        )
     }
 }
 
@@ -130,8 +266,7 @@ private fun HistoryScreenContent(
         ) { item ->
             when (item) {
                 is HistoryUiModel.Header -> {
-                    ListGroupHeader(
-                        modifier = Modifier.animateItem(),
+                    VmhHistoryDayHeader(
                         text = relativeDateText(item.date),
                     )
                 }

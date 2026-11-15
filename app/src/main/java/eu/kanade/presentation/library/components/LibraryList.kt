@@ -40,9 +40,18 @@ internal fun LibraryList(
 
         items(
             items = items,
+            key = { it.libraryManga.id },
             contentType = { "library_list_item" },
         ) { libraryItem ->
             val manga = libraryItem.libraryManga.manga
+
+            val totalChapters = libraryItem.libraryManga.totalChapters
+            val progress = if (totalChapters > 0) {
+                (libraryItem.libraryManga.readCount.toFloat() / totalChapters.toFloat()).coerceIn(0f, 1f)
+            } else {
+                null
+            }
+
             MangaListItem(
                 isSelected = manga.id in selection,
                 title = manga.title,
@@ -61,6 +70,7 @@ internal fun LibraryList(
                         sourceLanguage = libraryItem.badges.sourceLanguage,
                     )
                 },
+                progress = progress,
                 onLongClick = { onLongClick(libraryItem.libraryManga) },
                 onClick = { onClick(libraryItem.libraryManga) },
                 onClickContinueReading = if (onClickContinueReading != null && libraryItem.unreadCount > 0) {

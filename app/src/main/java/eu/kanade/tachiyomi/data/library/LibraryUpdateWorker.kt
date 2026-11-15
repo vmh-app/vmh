@@ -291,8 +291,10 @@ class LibraryUpdateWorker(private val context: Context, workerParams: WorkerPara
                                             }
 
                                             // Sources update concurrently, and getAndSet is a separate read and write
+                                            // Cuenta mangas con novedades, no capítulos: 951 capítulos de una serie
+                                            // no pueden valer 951 avisos.
                                             synchronized(libraryPreferences.newUpdatesCount) {
-                                                libraryPreferences.newUpdatesCount.getAndSet { it + newChapters.size }
+                                                libraryPreferences.newUpdatesCount.getAndSet { it + 1 }
                                             }
 
                                             // Convert to the manga that contains new chapters

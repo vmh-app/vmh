@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -20,7 +19,6 @@ import eu.kanade.presentation.updates.UpdatesDeleteConfirmationDialog
 import eu.kanade.presentation.updates.UpdatesFilterDialog
 import eu.kanade.presentation.util.Tab
 import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.ui.download.DownloadQueueScreen
 import eu.kanade.tachiyomi.ui.home.HomeScreen
 import eu.kanade.tachiyomi.ui.main.MainActivity
 import eu.kanade.tachiyomi.ui.manga.MangaScreen
@@ -41,14 +39,10 @@ data object UpdatesTab : Tab {
             val image = AnimatedImageVector.animatedVectorResource(R.drawable.animated_updates)
             return TabOptions(
                 index = 1u,
-                title = stringResource(MR.strings.label_recent_updates),
+                title = stringResource(MR.strings.vmh_nav_updates),
                 icon = rememberAnimatedVectorPainter(image, isSelected),
             )
         }
-
-    override suspend fun onReselect(navigator: Navigator) {
-        navigator.push(DownloadQueueScreen)
-    }
 
     @Composable
     override fun Content() {
@@ -62,6 +56,7 @@ data object UpdatesTab : Tab {
             state = state,
             snackbarHostState = viewModel.snackbarHostState,
             lastUpdated = viewModel.lastUpdated,
+            navigateUp = { navigator.pop() },
             onClickCover = { item -> navigator.push(MangaScreen(item.update.mangaId)) },
             onSelectAll = viewModel::toggleAllSelection,
             onInvertSelection = viewModel::invertSelection,

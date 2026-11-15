@@ -1,6 +1,7 @@
 package eu.kanade.presentation.library.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -13,24 +14,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -38,16 +34,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eu.kanade.presentation.manga.components.MangaCover
 import mihon.icons.materialsymbols.MaterialSymbols
+import mihon.icons.materialsymbols.rounded.Check
 import mihon.icons.materialsymbols.roundedfilled.PlayArrow
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.BadgeGroup
+import tachiyomi.presentation.core.components.VmhCoverShape
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.selectedBackground
 import tachiyomi.domain.manga.model.MangaCover as MangaCoverModel
 
 object CommonMangaItemDefaults {
-    val GridHorizontalSpacer = 4.dp
-    val GridVerticalSpacer = 4.dp
+    val GridHorizontalSpacer = 8.dp
+    val GridVerticalSpacer = 8.dp
 
     @Suppress("ConstPropertyName")
     const val BrowseFavoriteCoverAlpha = 0.34f
@@ -62,12 +60,6 @@ private val ContinueReadingButtonIconSizeLarge = 20.dp
 private val ContinueReadingButtonGridPadding = 6.dp
 private val ContinueReadingButtonListSpacing = 8.dp
 
-private const val GRID_SELECTED_COVER_ALPHA = 0.76f
-
-/**
- * Layout of grid list item with title overlaying the cover.
- * Accepts null [title] for a cover-only view.
- */
 @Composable
 fun MangaCompactGridItem(
     coverData: MangaCoverModel,
@@ -79,100 +71,51 @@ fun MangaCompactGridItem(
     coverAlpha: Float = 1f,
     coverBadgeStart: @Composable (RowScope.() -> Unit)? = null,
     coverBadgeEnd: @Composable (RowScope.() -> Unit)? = null,
+    progress: Float? = null,
 ) {
     GridItemSelectable(
-        isSelected = isSelected,
         onClick = onClick,
         onLongClick = onLongClick,
     ) {
-        MangaGridCover(
-            cover = {
-                MangaCover.Book(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .alpha(if (isSelected) GRID_SELECTED_COVER_ALPHA else coverAlpha),
-                    data = coverData,
-                )
-            },
-            badgesStart = coverBadgeStart,
-            badgesEnd = coverBadgeEnd,
-            content = {
-                if (title != null) {
-                    CoverTextOverlay(
-                        title = title,
-                        onClickContinueReading = onClickContinueReading,
-                    )
-                } else if (onClickContinueReading != null) {
-                    ContinueReadingButton(
-                        size = ContinueReadingButtonSizeLarge,
-                        iconSize = ContinueReadingButtonIconSizeLarge,
-                        onClick = onClickContinueReading,
+        Column {
+            MangaGridCover(
+                isSelected = isSelected,
+                cover = {
+                    MangaCover.Book(
                         modifier = Modifier
-                            .padding(ContinueReadingButtonGridPadding)
-                            .align(Alignment.BottomEnd),
+                            .fillMaxWidth()
+                            .alpha(coverAlpha),
+                        data = coverData,
                     )
-                }
-            },
-        )
-    }
-}
-
-/**
- * Title overlay for [MangaCompactGridItem]
- */
-@Composable
-private fun BoxScope.CoverTextOverlay(
-    title: String,
-    onClickContinueReading: (() -> Unit)? = null,
-) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(bottomStart = 4.dp, bottomEnd = 4.dp))
-            .background(
-                Brush.verticalGradient(
-                    0f to Color.Transparent,
-                    1f to Color(0xAA000000),
-                ),
+                },
+                badgesStart = coverBadgeStart,
+                badgesEnd = coverBadgeEnd,
+                progress = progress,
+                content = {
+                    if (onClickContinueReading != null) {
+                        ContinueReadingButton(
+                            size = ContinueReadingButtonSizeLarge,
+                            iconSize = ContinueReadingButtonIconSizeLarge,
+                            onClick = onClickContinueReading,
+                            modifier = Modifier
+                                .padding(ContinueReadingButtonGridPadding)
+                                .align(Alignment.BottomEnd),
+                        )
+                    }
+                },
             )
-            .fillMaxHeight(0.33f)
-            .fillMaxWidth()
-            .align(Alignment.BottomCenter),
-    )
-    Row(
-        modifier = Modifier.align(Alignment.BottomStart),
-        verticalAlignment = Alignment.Bottom,
-    ) {
-        GridItemTitle(
-            modifier = Modifier
-                .weight(1f)
-                .padding(8.dp),
-            title = title,
-            style = MaterialTheme.typography.titleSmall.copy(
-                color = Color.White,
-                shadow = Shadow(
-                    color = Color.Black,
-                    blurRadius = 4f,
-                ),
-            ),
-            minLines = 1,
-        )
-        if (onClickContinueReading != null) {
-            ContinueReadingButton(
-                size = ContinueReadingButtonSizeSmall,
-                iconSize = ContinueReadingButtonIconSizeSmall,
-                onClick = onClickContinueReading,
-                modifier = Modifier.padding(
-                    end = ContinueReadingButtonGridPadding,
-                    bottom = ContinueReadingButtonGridPadding,
-                ),
-            )
+            if (title != null) {
+                GridItemTitle(
+                    modifier = Modifier.padding(start = 2.dp, top = 6.dp, end = 2.dp),
+                    title = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    minLines = 1,
+                )
+            }
         }
     }
 }
 
-/**
- * Layout of grid list item with title below the cover.
- */
 @Composable
 fun MangaComfortableGridItem(
     coverData: MangaCoverModel,
@@ -185,24 +128,26 @@ fun MangaComfortableGridItem(
     coverBadgeStart: (@Composable RowScope.() -> Unit)? = null,
     coverBadgeEnd: (@Composable RowScope.() -> Unit)? = null,
     onClickContinueReading: (() -> Unit)? = null,
+    progress: Float? = null,
 ) {
     GridItemSelectable(
-        isSelected = isSelected,
         onClick = onClick,
         onLongClick = onLongClick,
     ) {
         Column {
             MangaGridCover(
+                isSelected = isSelected,
                 cover = {
                     MangaCover.Book(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .alpha(if (isSelected) GRID_SELECTED_COVER_ALPHA else coverAlpha),
+                            .alpha(coverAlpha),
                         data = coverData,
                     )
                 },
                 badgesStart = coverBadgeStart,
                 badgesEnd = coverBadgeEnd,
+                progress = progress,
                 content = {
                     if (onClickContinueReading != null) {
                         ContinueReadingButton(
@@ -227,24 +172,40 @@ fun MangaComfortableGridItem(
     }
 }
 
-/**
- * Common cover layout to add contents to be drawn on top of the cover.
- */
 @Composable
 private fun MangaGridCover(
     modifier: Modifier = Modifier,
     cover: @Composable BoxScope.() -> Unit = {},
     badgesStart: (@Composable RowScope.() -> Unit)? = null,
     badgesEnd: (@Composable RowScope.() -> Unit)? = null,
+    progress: Float? = null,
+    isSelected: Boolean = false,
     content: @Composable (BoxScope.() -> Unit)? = null,
 ) {
+    val colors = MaterialTheme.colorScheme
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(MangaCover.Book.ratio),
+            .aspectRatio(MangaCover.Book.ratio)
+            // El filete va antes del recorte: asi se dibuja completo sobre el borde de la
+            // portada y no queda media linea recortada ni una franja clara entre los dos.
+            .border(
+                width = if (isSelected) 2.dp else 1.dp,
+                color = if (isSelected) colors.primary else colors.outlineVariant.copy(alpha = 0.55f),
+                shape = VmhCoverShape,
+            )
+            .clip(VmhCoverShape),
     ) {
         cover()
+        if (isSelected) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(colors.primary.copy(alpha = 0.18f)),
+            )
+        }
         content?.invoke(this)
+
         if (badgesStart != null) {
             BadgeGroup(
                 modifier = Modifier
@@ -261,6 +222,42 @@ private fun MangaGridCover(
                     .align(Alignment.TopEnd),
                 content = badgesEnd,
             )
+        }
+
+        if (isSelected) {
+            Box(
+                modifier = Modifier
+                    .padding(6.dp)
+                    .align(Alignment.BottomStart)
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(colors.primary),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = MaterialSymbols.Rounded.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(15.dp),
+                    tint = colors.onPrimary,
+                )
+            }
+        }
+
+        if (progress != null && progress > 0f) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .background(Color.Black.copy(alpha = 0.3f)),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(progress.coerceIn(0f, 1f))
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colorScheme.primary),
+                )
+            }
         }
     }
 }
@@ -285,12 +282,8 @@ private fun GridItemTitle(
     )
 }
 
-/**
- * Wrapper for grid items to handle selection state, click and long click.
- */
 @Composable
 private fun GridItemSelectable(
-    isSelected: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -303,31 +296,12 @@ private fun GridItemSelectable(
                 onClick = onClick,
                 onLongClick = onLongClick,
             )
-            .selectedOutline(isSelected = isSelected, color = MaterialTheme.colorScheme.secondary)
             .padding(4.dp),
     ) {
-        val contentColor = if (isSelected) {
-            MaterialTheme.colorScheme.onSecondary
-        } else {
-            LocalContentColor.current
-        }
-        CompositionLocalProvider(LocalContentColor provides contentColor) {
-            content()
-        }
+        content()
     }
 }
 
-/**
- * @see GridItemSelectable
- */
-private fun Modifier.selectedOutline(
-    isSelected: Boolean,
-    color: Color,
-) = drawBehind { if (isSelected) drawRect(color = color) }
-
-/**
- * Layout of list item.
- */
 @Composable
 fun MangaListItem(
     coverData: MangaCoverModel,
@@ -338,6 +312,7 @@ fun MangaListItem(
     isSelected: Boolean = false,
     coverAlpha: Float = 1f,
     onClickContinueReading: (() -> Unit)? = null,
+    progress: Float? = null,
 ) {
     Row(
         modifier = Modifier
@@ -350,12 +325,31 @@ fun MangaListItem(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MangaCover.Square(
-            modifier = Modifier
-                .fillMaxHeight()
-                .alpha(coverAlpha),
-            data = coverData,
-        )
+        Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
+            MangaCover.Square(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .alpha(coverAlpha),
+                data = coverData,
+            )
+            if (progress != null && progress > 0f) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .background(Color.Black.copy(alpha = 0.3f)),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progress.coerceIn(0f, 1f))
+                            .fillMaxHeight()
+                            .background(MaterialTheme.colorScheme.primary),
+                    )
+                }
+            }
+        }
+
         Text(
             text = title,
             modifier = Modifier
@@ -365,7 +359,9 @@ fun MangaListItem(
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.bodyMedium,
         )
+
         BadgeGroup(content = badge)
+
         if (onClickContinueReading != null) {
             ContinueReadingButton(
                 size = ContinueReadingButtonSizeSmall,
@@ -387,10 +383,10 @@ private fun ContinueReadingButton(
     Box(modifier = modifier) {
         FilledIconButton(
             onClick = onClick,
-            shape = MaterialTheme.shapes.small,
+            shape = CircleShape,
             colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f),
-                contentColor = contentColorFor(MaterialTheme.colorScheme.primaryContainer),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
             ),
             modifier = Modifier.size(size),
         ) {

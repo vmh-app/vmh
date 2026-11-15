@@ -18,10 +18,10 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.util.fastAll
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -44,7 +44,6 @@ import eu.kanade.tachiyomi.ui.manga.MangaScreen
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.system.workManager
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mihon.feature.migration.config.MigrationConfigScreen
@@ -66,19 +65,11 @@ data object LibraryTab : Tab {
 
     override val options: TabOptions
         @Composable
-        get() {
-            val isSelected = LocalTabNavigator.current.current.key == key
-            val image = AnimatedImageVector.animatedVectorResource(R.drawable.animated_library)
-            return TabOptions(
-                index = 0u,
-                title = stringResource(MR.strings.label_library),
-                icon = rememberAnimatedVectorPainter(image, isSelected),
-            )
-        }
-
-    override suspend fun onReselect(navigator: Navigator) {
-        requestOpenSettingsSheet()
-    }
+        get() = TabOptions(
+            index = 0u,
+            title = stringResource(MR.strings.label_library),
+            icon = painterResource(R.drawable.ic_vmh_nav_library),
+        )
 
     @Composable
     override fun Content() {
@@ -275,16 +266,11 @@ data object LibraryTab : Tab {
         ReportDrawnWhen { !state.isLoading }
 
         LaunchedEffect(Unit) {
-            launch { queryEvent.receiveAsFlow().collect(viewModel::search) }
-            launch { requestSettingsSheetEvent.receiveAsFlow().collectLatest { viewModel.showSettingsDialog() } }
+            queryEvent.receiveAsFlow().collect(viewModel::search)
         }
     }
 
     // For invoking search from other screen
     private val queryEvent = Channel<String>()
     suspend fun search(query: String) = queryEvent.send(query)
-
-    // For opening settings sheet in LibraryController
-    private val requestSettingsSheetEvent = Channel<Unit>()
-    private suspend fun requestOpenSettingsSheet() = requestSettingsSheetEvent.send(Unit)
 }

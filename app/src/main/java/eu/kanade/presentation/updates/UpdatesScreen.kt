@@ -40,6 +40,7 @@ import tachiyomi.presentation.core.components.FastScrollLazyColumn
 import tachiyomi.presentation.core.components.material.PullRefresh
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.screens.EmptyArt
 import tachiyomi.presentation.core.screens.EmptyScreen
 import tachiyomi.presentation.core.screens.LoadingScreen
 import tachiyomi.presentation.core.theme.active
@@ -50,6 +51,7 @@ fun UpdateScreen(
     state: UpdatesViewModel.State,
     snackbarHostState: SnackbarHostState,
     lastUpdated: Long,
+    navigateUp: () -> Unit,
     onClickCover: (UpdatesItem) -> Unit,
     onSelectAll: (Boolean) -> Unit,
     onInvertSelection: () -> Unit,
@@ -73,6 +75,7 @@ fun UpdateScreen(
     Scaffold(
         topBar = { scrollBehavior ->
             UpdatesAppBar(
+                navigateUp = navigateUp,
                 onCalendarClicked = { onCalendarClicked() },
                 onUpdateLibrary = { scope.launch { onUpdateLibrary() } },
                 onFilterClicked = { onFilterClicked() },
@@ -128,6 +131,7 @@ fun UpdateScreen(
                                     MR.strings.information_no_recent
                                 },
                                 modifier = Modifier.weight(1f),
+                                art = if (hasActiveFilters) EmptyArt.SEARCH else EmptyArt.SLEEP,
                             )
                         }
                     } else {
@@ -154,6 +158,7 @@ fun UpdateScreen(
 
 @Composable
 private fun UpdatesAppBar(
+    navigateUp: () -> Unit,
     onCalendarClicked: () -> Unit,
     onUpdateLibrary: () -> Unit,
     onFilterClicked: () -> Unit,
@@ -169,6 +174,7 @@ private fun UpdatesAppBar(
     AppBar(
         modifier = modifier,
         title = stringResource(MR.strings.label_recent_updates),
+        navigateUp = navigateUp,
         actions = {
             AppBarActions(
                 listOf(
