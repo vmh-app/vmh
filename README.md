@@ -12,6 +12,7 @@ just the sites you already read, one library and one place to pick up where you 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-0877d2)](/LICENSE)
 [![Android 8.0+](https://img.shields.io/badge/android-8.0%2B-3ddc84)](#download)
 [![Latest release](https://img.shields.io/github/v/release/vmh-app/vmh)](https://github.com/vmh-app/vmh/releases/latest)
+[![Extensions](https://img.shields.io/badge/extensions-vmh--extensions.pages.dev-b26a00)](https://vmh-extensions.pages.dev)
 
 </div>
 
@@ -55,6 +56,15 @@ The app walks you through these four steps the first time it opens.
 VMH installs the same extension APKs that Tachiyomi and Mihon use, so any repository
 built for them is valid here. Extensions signed by the community repositories or by
 VMH are trusted without extra steps.
+
+The VMH store is added for you the first time you open the app. You only need this
+address if you add it by hand (Settings → Extensions → Repositories → Add repository):
+
+```
+https://vmh-extensions.pages.dev/index.min.json
+```
+
+Store home, with the full list and the signing key: https://vmh-extensions.pages.dev
 
 ## Build
 
