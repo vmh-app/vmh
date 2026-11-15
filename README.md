@@ -9,7 +9,7 @@
 Manga, manhwa and webtoon reader for Android. No account, no ads, no clutter:
 just the sites you already read, one library and one place to pick up where you left off.
 
-[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-0877d2)](/LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-0877d2)](/LICENSE)
 [![Android 8.0+](https://img.shields.io/badge/android-8.0%2B-3ddc84)](#download)
 [![Latest release](https://img.shields.io/github/v/release/vmh-app/vmh)](https://github.com/vmh-app/vmh/releases/latest)
 
@@ -69,7 +69,7 @@ the signing configuration is read from `keystore.properties`, which is never com
 
 VMH is a fork of [Mihon](https://github.com/mihonapp/mihon), which in turn descends from
 [Tachiyomi](https://github.com/tachiyomiorg). Both are licensed under the
-[GNU General Public License v3.0](/LICENSE); this project keeps the same license and the
+[Apache License 2.0](/LICENSE); this project keeps the same license and the
 same upstream history.
 
 VMH does not host or distribute any content. It only displays what its sources return.
