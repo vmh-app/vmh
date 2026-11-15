@@ -203,9 +203,9 @@ class ExtensionStoreRepositoryImpl(
 
     companion object {
         private const val DEFAULT_STORE_INDEX_URL =
-            "https://vmh-extensions.gestevezmurillo.workers.dev/index.min.json"
+            "https://vmh-extensions.pages.dev/index.min.json"
         private const val DEFAULT_STORE_NAME = "VMH"
-        private const val DEFAULT_STORE_WEBSITE = "https://vmh-extensions.gestevezmurillo.workers.dev"
+        private const val DEFAULT_STORE_WEBSITE = "https://vmh-extensions.pages.dev"
 
         /** Signing key of the VMH extension store, the same keystore that signs the app. */
         private const val DEFAULT_STORE_SIGNING_KEY =

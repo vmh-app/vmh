@@ -1,11 +1,11 @@
 package tachiyomi.core.common
 
 object Constants {
-    const val URL_HELP = "https://vmh-extensions.gestevezmurillo.workers.dev"
-    const val URL_HELP_UPCOMING = "https://vmh-extensions.gestevezmurillo.workers.dev"
+    const val URL_HELP = "https://github.com/vmh-app/vmh"
+    const val URL_HELP_UPCOMING = "https://github.com/vmh-app/vmh"
     const val URL_DONATE_PATREON = "https://patreon.com/mihon/membership"
     const val URL_DONATE_OPENCOLLECTIVE = "https://opencollective.com/mihon/contribute"
-    const val URL_DISCORD = "https://vmh-extensions.gestevezmurillo.workers.dev"
+    const val URL_DISCORD = "https://github.com/vmh-app/vmh"
 
     const val MANGA_EXTRA = "manga"
 
