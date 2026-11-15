@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -173,16 +174,20 @@ fun AppBarTitle(
         title?.let {
             Text(
                 text = it,
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                letterSpacing = (-0.3).sp,
             )
         }
         subtitle?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                letterSpacing = 0.4.sp,
                 modifier = Modifier.basicMarquee(
                     repeatDelayMillis = 2_000,
                 ),
@@ -208,16 +213,14 @@ fun AppBarActions(
             state = rememberTooltipState(),
             focusable = false,
         ) {
-            IconButton(
+            VmhCircleAction(
+                icon = it.icon,
+                contentDescription = it.title,
                 onClick = it.onClick,
+                tint = it.iconTint,
                 enabled = it.enabled,
-            ) {
-                Icon(
-                    imageVector = it.icon,
-                    tint = it.iconTint ?: LocalContentColor.current,
-                    contentDescription = it.title,
-                )
-            }
+                modifier = Modifier.padding(start = 6.dp),
+            )
         }
     }
 
@@ -233,14 +236,12 @@ fun AppBarActions(
             state = rememberTooltipState(),
             focusable = false,
         ) {
-            IconButton(
+            VmhCircleAction(
+                icon = MaterialSymbols.Rounded.MoreVert,
+                contentDescription = stringResource(MR.strings.action_menu_overflow_description),
                 onClick = { showMenu = !showMenu },
-            ) {
-                Icon(
-                    MaterialSymbols.Rounded.MoreVert,
-                    contentDescription = stringResource(MR.strings.action_menu_overflow_description),
-                )
-            }
+                modifier = Modifier.padding(start = 6.dp),
+            )
         }
 
         DropdownMenu(
@@ -374,14 +375,11 @@ fun SearchToolbar(
                         state = rememberTooltipState(),
                         focusable = false,
                     ) {
-                        IconButton(
+                        VmhCircleAction(
+                            icon = MaterialSymbols.Rounded.Search,
+                            contentDescription = stringResource(MR.strings.action_search),
                             onClick = onClick,
-                        ) {
-                            Icon(
-                                MaterialSymbols.Rounded.Search,
-                                contentDescription = stringResource(MR.strings.action_search),
-                            )
-                        }
+                        )
                     }
                 } else if (searchQuery.isNotEmpty()) {
                     TooltipBox(
@@ -394,18 +392,15 @@ fun SearchToolbar(
                         state = rememberTooltipState(),
                         focusable = false,
                     ) {
-                        IconButton(
+                        VmhCircleAction(
+                            icon = MaterialSymbols.Rounded.Close,
+                            contentDescription = stringResource(MR.strings.action_reset),
                             onClick = {
                                 searchFieldState.clearText()
                                 onClick()
                                 focusRequester.requestFocus()
                             },
-                        ) {
-                            Icon(
-                                MaterialSymbols.Rounded.Close,
-                                contentDescription = stringResource(MR.strings.action_reset),
-                            )
-                        }
+                        )
                     }
                 }
             }

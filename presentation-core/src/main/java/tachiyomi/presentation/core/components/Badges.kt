@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.Icon
@@ -21,17 +22,29 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
+/**
+ * Grupo de insignias de VMH.
+ *
+ * Mihon usa esquinas rectas pegadas al borde de la portada; VMH usa una
+ * pastilla redondeada y separada, con cifras más espaciadas.
+ */
 @Composable
 fun BadgeGroup(
     modifier: Modifier = Modifier,
-    shape: Shape = MaterialTheme.shapes.extraSmall,
+    shape: Shape = VmhBadgeShape,
     content: @Composable RowScope.() -> Unit,
 ) {
-    Row(modifier = modifier.clip(shape)) {
+    Row(
+        modifier = modifier.clip(shape),
+        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(3.dp),
+    ) {
         content()
     }
 }
+
+private val VmhBadgeShape = RoundedCornerShape(7.dp)
 
 @Composable
 fun Badge(
@@ -39,18 +52,19 @@ fun Badge(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.secondary,
     textColor: Color = MaterialTheme.colorScheme.onSecondary,
-    shape: Shape = RectangleShape,
+    shape: Shape = VmhBadgeShape,
 ) {
     Text(
         text = text,
         modifier = modifier
             .clip(shape)
             .background(color)
-            .padding(horizontal = 3.dp, vertical = 1.dp),
+            .padding(horizontal = 5.dp, vertical = 1.dp),
         color = textColor,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = 0.3.sp,
         maxLines = 1,
-        style = MaterialTheme.typography.bodySmall,
+        style = MaterialTheme.typography.labelSmall,
     )
 }
 
@@ -60,7 +74,7 @@ fun Badge(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.secondary,
     iconColor: Color = MaterialTheme.colorScheme.onSecondary,
-    shape: Shape = RectangleShape,
+    shape: Shape = VmhBadgeShape,
 ) {
     val iconContentPlaceholder = "[icon]"
     val text = buildAnnotatedString {
@@ -91,10 +105,10 @@ fun Badge(
         modifier = modifier
             .clip(shape)
             .background(color)
-            .padding(horizontal = 3.dp, vertical = 1.dp),
+            .padding(horizontal = 4.dp, vertical = 1.dp),
         color = iconColor,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         maxLines = 1,
-        style = MaterialTheme.typography.bodySmall,
+        style = MaterialTheme.typography.labelSmall,
     )
 }

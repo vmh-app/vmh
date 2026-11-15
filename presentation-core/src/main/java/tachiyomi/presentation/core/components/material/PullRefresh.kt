@@ -40,14 +40,17 @@ fun PullRefresh(
     ) {
         content()
 
-        PullToRefreshDefaults.Indicator(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(indicatorPadding),
-            isRefreshing = refreshing,
-            state = state,
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        // Material3 paints the indicator container even at rest in this version; only mount it while in use.
+        if (refreshing || state.distanceFraction > 0f) {
+            PullToRefreshDefaults.Indicator(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(indicatorPadding),
+                isRefreshing = refreshing,
+                state = state,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }

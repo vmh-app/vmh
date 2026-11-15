@@ -29,8 +29,10 @@ import tachiyomi.presentation.core.components.material.SECONDARY_ALPHA
 @Composable
 fun Modifier.selectedBackground(isSelected: Boolean): Modifier {
     if (!isSelected) return this
-    val alpha = if (isSystemInDarkTheme()) 0.16f else 0.22f
-    val color = MaterialTheme.colorScheme.secondary.copy(alpha = alpha)
+    // El coral del tema (secondary) se leia como un error; la seleccion usa el azul de marca,
+    // igual que las pastillas y casillas activas del resto de VMH.
+    val alpha = if (isSystemInDarkTheme()) 0.18f else 0.12f
+    val color = MaterialTheme.colorScheme.primary.copy(alpha = alpha)
     return this.drawBehind { drawRect(color) }
 }
 

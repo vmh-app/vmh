@@ -1,8 +1,11 @@
 package tachiyomi.presentation.core.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.FlowRowScope
@@ -15,7 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.Checkbox
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -37,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -48,6 +52,7 @@ import dev.icerock.moko.resources.StringResource
 import mihon.icons.materialsymbols.MaterialSymbols
 import mihon.icons.materialsymbols.rounded.ArrowDownward
 import mihon.icons.materialsymbols.rounded.ArrowUpward
+import mihon.icons.materialsymbols.rounded.Check
 import mihon.icons.materialsymbols.rounded.CheckBoxOutlineBlank
 import mihon.icons.materialsymbols.roundedfilled.CheckBox
 import mihon.icons.materialsymbols.roundedfilled.DisabledByDefault
@@ -135,14 +140,49 @@ fun CheckboxItem(label: String, checked: Boolean, onClick: () -> Unit) {
     BaseSettingsItem(
         label = label,
         widget = {
-            Checkbox(
+            VmhCheckbox(
                 checked = checked,
-                onCheckedChange = null,
+                modifier = Modifier.size(24.dp),
             )
         },
         onClick = onClick,
     )
 }
+
+/**
+ * Marca de seleccion VMH: cuadro redondeado que se rellena de `primary` con una palomita cuando
+ * esta activo y queda como contorno neutro cuando no.
+ *
+ * Sustituye al `Checkbox` de Material en el widget de [CheckboxItem]; la fila, el texto y el
+ * comportamiento no cambian.
+ */
+@Composable
+fun VmhCheckbox(checked: Boolean, modifier: Modifier = Modifier) {
+    val colors = MaterialTheme.colorScheme
+    Box(
+        modifier = modifier
+            .size(23.dp)
+            .clip(vmhCheckShape)
+            .background(if (checked) colors.primary else Color.Transparent)
+            .border(
+                width = if (checked) 1.dp else 1.5.dp,
+                color = if (checked) colors.primary else colors.outline,
+                shape = vmhCheckShape,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (checked) {
+            Icon(
+                imageVector = MaterialSymbols.Rounded.Check,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = colors.onPrimary,
+            )
+        }
+    }
+}
+
+private val vmhCheckShape = RoundedCornerShape(7.dp)
 
 @Composable
 fun RadioItem(label: String, selected: Boolean, onClick: () -> Unit) {

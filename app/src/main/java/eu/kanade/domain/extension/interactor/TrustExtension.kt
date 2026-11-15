@@ -22,7 +22,19 @@ class TrustExtension(
     fun isTrusted(pkgInfo: PackageInfo, fingerprints: List<String>, stores: List<ExtensionStore>): Boolean {
         val trustedFingerprints = stores.mapTo(HashSet()) { it.signingKey }
         val key = "${pkgInfo.packageName}:${PackageInfoCompat.getLongVersionCode(pkgInfo)}:${fingerprints.last()}"
-        return trustedFingerprints.any { fingerprints.contains(it) } || key in preferences.trustedExtensions.get()
+
+        // VMH signs the app and every extension it publishes with the same keystore, so a first
+        // party signature is trusted without asking the user or needing the store to be added.
+        if (fingerprints.any { fingerprint ->
+                FIRST_PARTY_SIGNATURES.any { it.equals(fingerprint, ignoreCase = true) }
+            }
+        ) {
+            return true
+        }
+
+        return trustedFingerprints.any { trusted ->
+            fingerprints.any { it.equals(trusted, ignoreCase = true) }
+        } || key in preferences.trustedExtensions.get()
     }
 
     fun trust(pkgName: String, versionCode: Long, signatureHash: String) {
@@ -55,5 +67,18 @@ class TrustExtension(
                 .drop(1),
         )
             .map {}
+    }
+
+    companion object {
+        /**
+         * Signatures trusted out of the box, with no store added and no prompt shown.
+         *
+         * The release keystore of VMH (`vmh-release.jks`) is also the one used to sign the
+         * extension store index and its APKs, so any extension carrying this fingerprint is
+         * built by us and safe to load.
+         */
+        private val FIRST_PARTY_SIGNATURES = listOf(
+            "6704a01d6528f9547e3b27b5c72b2a6daf96aefb3070c86969d85219c5f0170b",
+        )
     }
 }

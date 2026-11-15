@@ -24,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
@@ -37,7 +39,8 @@ import tachiyomi.presentation.core.util.secondaryItemAlpha
 
 @Composable
 fun InfoScreen(
-    icon: ImageVector,
+    icon: ImageVector? = null,
+    iconPainter: Painter? = null,
     headingText: String,
     subtitleText: String,
     acceptText: String,
@@ -108,14 +111,25 @@ fun InfoScreen(
                 .padding(top = 48.dp)
                 .padding(horizontal = MaterialTheme.padding.medium),
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(bottom = MaterialTheme.padding.small)
-                    .size(48.dp),
-                tint = MaterialTheme.colorScheme.primary,
-            )
+            if (iconPainter != null) {
+                Icon(
+                    painter = iconPainter,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(bottom = MaterialTheme.padding.small)
+                        .size(64.dp),
+                    tint = Color.Unspecified,
+                )
+            } else if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(bottom = MaterialTheme.padding.small)
+                        .size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
             Text(
                 text = headingText,
                 style = MaterialTheme.typography.headlineLarge,
