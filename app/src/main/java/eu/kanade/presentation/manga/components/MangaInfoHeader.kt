@@ -200,50 +200,50 @@ fun MangaActionRow(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.Top,
             ) {
-            MangaActionButton(
-                title = if (favorite) {
-                    stringResource(MR.strings.in_library)
-                } else {
-                    stringResource(MR.strings.add_to_library)
-                },
-                icon = if (favorite) MaterialSymbols.RoundedFilled.Favorite else MaterialSymbols.Rounded.Favorite,
-                color = if (favorite) MaterialTheme.colorScheme.secondary else defaultActionButtonColor,
-                onClick = onAddToLibraryClicked,
-                onLongClick = onEditCategory,
-            )
-            MangaActionButton(
-                title = when (nextUpdateDays) {
-                    null -> stringResource(MR.strings.not_applicable)
-                    0 -> stringResource(MR.strings.manga_interval_expected_update_soon)
-                    else -> pluralStringResource(
-                        MR.plurals.day,
-                        count = nextUpdateDays,
-                        nextUpdateDays,
-                    )
-                },
-                icon = MaterialSymbols.Rounded.HourglassEmpty,
-                color = if (isUserIntervalMode) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
-                onClick = { onEditIntervalClicked?.invoke() },
-            )
-            MangaActionButton(
-                title = if (trackingCount == 0) {
-                    stringResource(MR.strings.manga_tracking_tab)
-                } else {
-                    pluralStringResource(MR.plurals.num_trackers, count = trackingCount, trackingCount)
-                },
-                icon = if (trackingCount == 0) MaterialSymbols.Rounded.Sync else MaterialSymbols.Rounded.Check,
-                color = if (trackingCount == 0) defaultActionButtonColor else MaterialTheme.colorScheme.primary,
-                onClick = onTrackingClicked,
-            )
-            if (onWebViewClicked != null) {
                 MangaActionButton(
-                    title = stringResource(MR.strings.action_web_view),
-                    icon = MaterialSymbols.Rounded.Public,
-                    color = defaultActionButtonColor,
-                    onClick = onWebViewClicked,
-                    onLongClick = onWebViewLongClicked,
+                    title = if (favorite) {
+                        stringResource(MR.strings.in_library)
+                    } else {
+                        stringResource(MR.strings.add_to_library)
+                    },
+                    icon = if (favorite) MaterialSymbols.RoundedFilled.Favorite else MaterialSymbols.Rounded.Favorite,
+                    color = if (favorite) MaterialTheme.colorScheme.secondary else defaultActionButtonColor,
+                    onClick = onAddToLibraryClicked,
+                    onLongClick = onEditCategory,
                 )
-            }
+                MangaActionButton(
+                    title = when (nextUpdateDays) {
+                        null -> stringResource(MR.strings.not_applicable)
+                        0 -> stringResource(MR.strings.manga_interval_expected_update_soon)
+                        else -> pluralStringResource(
+                            MR.plurals.day,
+                            count = nextUpdateDays,
+                            nextUpdateDays,
+                        )
+                    },
+                    icon = MaterialSymbols.Rounded.HourglassEmpty,
+                    color = if (isUserIntervalMode) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
+                    onClick = { onEditIntervalClicked?.invoke() },
+                )
+                MangaActionButton(
+                    title = if (trackingCount == 0) {
+                        stringResource(MR.strings.manga_tracking_tab)
+                    } else {
+                        pluralStringResource(MR.plurals.num_trackers, count = trackingCount, trackingCount)
+                    },
+                    icon = if (trackingCount == 0) MaterialSymbols.Rounded.Sync else MaterialSymbols.Rounded.Check,
+                    color = if (trackingCount == 0) defaultActionButtonColor else MaterialTheme.colorScheme.primary,
+                    onClick = onTrackingClicked,
+                )
+                if (onWebViewClicked != null) {
+                    MangaActionButton(
+                        title = stringResource(MR.strings.action_web_view),
+                        icon = MaterialSymbols.Rounded.Public,
+                        color = defaultActionButtonColor,
+                        onClick = onWebViewClicked,
+                        onLongClick = onWebViewLongClicked,
+                    )
+                }
             }
         }
     }
@@ -268,7 +268,11 @@ fun ExpandableMangaDescription(
             description.takeIf { !it.isNullOrBlank() } ?: stringResource(MR.strings.description_placeholder)
 
         // La sinopsis va dentro de una tarjeta de VMH, con el titulo de seccion y su filete.
-        VmhCard(modifier = Modifier.fillMaxWidth()) {
+        VmhCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        ) {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
@@ -288,6 +292,7 @@ fun ExpandableMangaDescription(
                     notes = notes,
                     onEditNotesClicked = onEditNotes,
                     modifier = Modifier.clickableNoIndication { onExpanded(!expanded) },
+                    scrimColor = MaterialTheme.colorScheme.surfaceContainer,
                 )
             }
         }
@@ -532,7 +537,9 @@ private fun ColumnScope.MangaContentInfo(
         )
     }
 
-    if (!artist.isNullOrBlank() && author != artist) {
+    // Si el dibujante ya aparece dentro del autor, la linea se repetiria.
+    val artistYaListado = author?.contains(artist.orEmpty().trim(), ignoreCase = true) == true
+    if (!artist.isNullOrBlank() && author != artist && !artistYaListado) {
         Row(
             modifier = Modifier.secondaryItemAlpha(),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
@@ -643,6 +650,7 @@ private fun MangaSummary(
     expanded: Boolean,
     onEditNotesClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    scrimColor: Color = MaterialTheme.colorScheme.background,
 ) {
     val context = LocalContext.current
     val preferences = remember { context.appGraph.uiPreferences }
@@ -686,7 +694,7 @@ private fun MangaSummary(
                 }
             },
             {
-                val colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background)
+                val colors = listOf(Color.Transparent, scrimColor)
                 Box(
                     modifier = Modifier.background(Brush.verticalGradient(colors = colors)),
                     contentAlignment = Alignment.Center,
@@ -733,22 +741,22 @@ private fun TagsChip(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    // Las etiquetas de genero usan la metacapsa de VMH, no el chip de sugerencia de Material.
+    // Las etiquetas de genero usan la pastilla de VMH, no el chip de sugerencia de Material.
     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
         Box(
             modifier = modifier
-                .clip(RoundedCornerShape(9.dp))
+                .clip(RoundedCornerShape(percent = 50))
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outlineVariant,
-                    shape = RoundedCornerShape(9.dp),
+                    shape = RoundedCornerShape(percent = 50),
                 )
                 .clickableNoIndication(onClick = onClick)
-                .padding(horizontal = 10.dp, vertical = 3.dp),
+                .padding(horizontal = 11.dp, vertical = 3.dp),
         ) {
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -793,7 +801,8 @@ private fun RowScope.MangaActionButton(
             fontWeight = FontWeight.Medium,
             letterSpacing = 0.2.sp,
             textAlign = TextAlign.Center,
-            maxLines = 1,
+            minLines = 2,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
     }

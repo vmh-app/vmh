@@ -7,21 +7,22 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.ZeroCornerSize
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,15 +38,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import eu.kanade.presentation.components.DownloadDropdownMenu
 import eu.kanade.presentation.components.DropdownMenu
 import eu.kanade.presentation.manga.DownloadAction
+import eu.kanade.tachiyomi.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -53,15 +59,12 @@ import kotlinx.coroutines.launch
 import mihon.icons.custommaterialsymbols.CustomMaterialSymbols
 import mihon.icons.custommaterialsymbols.rounded.DonePrevious
 import mihon.icons.materialsymbols.MaterialSymbols
-import mihon.icons.materialsymbols.automirroredrounded.Label
 import mihon.icons.materialsymbols.rounded.BookmarkAdd
 import mihon.icons.materialsymbols.rounded.BookmarkRemove
 import mihon.icons.materialsymbols.rounded.Delete
 import mihon.icons.materialsymbols.rounded.DoneAll
 import mihon.icons.materialsymbols.rounded.Download
-import mihon.icons.materialsymbols.rounded.MoreVert
 import mihon.icons.materialsymbols.rounded.RemoveDone
-import mihon.icons.materialsymbols.rounded.SwapCalls
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
 import kotlin.time.Duration.Companion.seconds
@@ -84,10 +87,15 @@ fun MangaBottomActionMenu(
         exit = shrinkVertically(shrinkTowards = Alignment.Bottom),
     ) {
         val scope = rememberCoroutineScope()
+        val colors = MaterialTheme.colorScheme
         Surface(
-            modifier = modifier,
-            shape = MaterialTheme.shapes.large.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = modifier
+                .navigationBarsPadding()
+                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+            shape = RoundedCornerShape(26.dp),
+            color = colors.surface,
+            border = BorderStroke(1.dp, colors.outlineVariant),
+            shadowElevation = 6.dp,
         ) {
             val haptic = LocalHapticFeedback.current
             val confirm = remember { mutableStateListOf(false, false, false, false, false, false, false) }
@@ -102,19 +110,14 @@ fun MangaBottomActionMenu(
                 }
             }
             Row(
-                modifier = Modifier
-                    .padding(
-                        WindowInsets.navigationBars
-                            .only(WindowInsetsSides.Bottom)
-                            .asPaddingValues(),
-                    )
-                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
             ) {
                 if (onBookmarkClicked != null) {
                     Button(
                         title = stringResource(MR.strings.action_bookmark),
                         icon = MaterialSymbols.Rounded.BookmarkAdd,
                         toConfirm = confirm[0],
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         onLongClick = { onLongClickItem(0) },
                         onClick = onBookmarkClicked,
                     )
@@ -124,6 +127,7 @@ fun MangaBottomActionMenu(
                         title = stringResource(MR.strings.action_remove_bookmark),
                         icon = MaterialSymbols.Rounded.BookmarkRemove,
                         toConfirm = confirm[1],
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         onLongClick = { onLongClickItem(1) },
                         onClick = onRemoveBookmarkClicked,
                     )
@@ -133,6 +137,7 @@ fun MangaBottomActionMenu(
                         title = stringResource(MR.strings.action_mark_as_read),
                         icon = MaterialSymbols.Rounded.DoneAll,
                         toConfirm = confirm[2],
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         onLongClick = { onLongClickItem(2) },
                         onClick = onMarkAsReadClicked,
                     )
@@ -142,6 +147,7 @@ fun MangaBottomActionMenu(
                         title = stringResource(MR.strings.action_mark_as_unread),
                         icon = MaterialSymbols.Rounded.RemoveDone,
                         toConfirm = confirm[3],
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         onLongClick = { onLongClickItem(3) },
                         onClick = onMarkAsUnreadClicked,
                     )
@@ -151,6 +157,7 @@ fun MangaBottomActionMenu(
                         title = stringResource(MR.strings.action_mark_previous_as_read),
                         icon = CustomMaterialSymbols.Rounded.DonePrevious,
                         toConfirm = confirm[4],
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         onLongClick = { onLongClickItem(4) },
                         onClick = onMarkPreviousAsReadClicked,
                     )
@@ -160,6 +167,7 @@ fun MangaBottomActionMenu(
                         title = stringResource(MR.strings.action_download),
                         icon = MaterialSymbols.Rounded.Download,
                         toConfirm = confirm[5],
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         onLongClick = { onLongClickItem(5) },
                         onClick = onDownloadClicked,
                     )
@@ -169,6 +177,7 @@ fun MangaBottomActionMenu(
                         title = stringResource(MR.strings.action_delete),
                         icon = MaterialSymbols.Rounded.Delete,
                         toConfirm = confirm[6],
+                        tint = MaterialTheme.colorScheme.error,
                         onLongClick = { onLongClickItem(6) },
                         onClick = onDeleteClicked,
                     )
@@ -183,6 +192,7 @@ private fun RowScope.Button(
     title: String,
     icon: ImageVector,
     toConfirm: Boolean,
+    tint: Color,
     onLongClick: () -> Unit,
     onClick: () -> Unit,
     content: (@Composable () -> Unit)? = null,
@@ -193,7 +203,7 @@ private fun RowScope.Button(
     )
     Box(
         modifier = Modifier
-            .size(48.dp)
+            .height(48.dp)
             .weight(animatedWeight)
             .combinedClickable(
                 interactionSource = null,
@@ -207,10 +217,20 @@ private fun RowScope.Button(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-            )
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(tint.copy(alpha = 0.10f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    tint = tint,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
             AnimatedVisibility(
                 visible = toConfirm,
                 enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
@@ -245,111 +265,204 @@ fun LibraryBottomActionMenu(
         exit = shrinkVertically(animationSpec = tween()),
     ) {
         val scope = rememberCoroutineScope()
-        Surface(
-            modifier = modifier,
-            shape = MaterialTheme.shapes.large.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        val colors = MaterialTheme.colorScheme
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         ) {
-            val haptic = LocalHapticFeedback.current
-            val confirm = remember { mutableStateListOf(false, false, false, false, false, false) }
-            var resetJob by remember { mutableStateOf<Job?>(null) }
-            val onLongClickItem: (Int) -> Unit = { toConfirmIndex ->
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                confirm.indices.forEach { i -> confirm[i] = i == toConfirmIndex }
-                resetJob?.cancel()
-                resetJob = scope.launch {
-                    delay(1.seconds)
-                    if (isActive) confirm[toConfirmIndex] = false
-                }
-            }
-            val itemOverflow = onDownloadClicked != null
-            Row(
-                modifier = Modifier
-                    .windowInsetsPadding(
-                        WindowInsets.navigationBars
-                            .only(WindowInsetsSides.Bottom),
-                    )
-                    .padding(horizontal = 8.dp, vertical = 12.dp),
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(26.dp),
+                color = colors.surface,
+                border = BorderStroke(1.dp, colors.outlineVariant),
+                shadowElevation = 10.dp,
             ) {
-                Button(
-                    title = stringResource(MR.strings.action_move_category),
-                    icon = MaterialSymbols.AutoMirroredRounded.Label,
-                    toConfirm = confirm[0],
-                    onLongClick = { onLongClickItem(0) },
-                    onClick = onChangeCategoryClicked,
-                )
-                Button(
-                    title = stringResource(MR.strings.action_mark_as_read),
-                    icon = MaterialSymbols.Rounded.DoneAll,
-                    toConfirm = confirm[1],
-                    onLongClick = { onLongClickItem(1) },
-                    onClick = onMarkAsReadClicked,
-                )
-                Button(
-                    title = stringResource(MR.strings.action_mark_as_unread),
-                    icon = MaterialSymbols.Rounded.RemoveDone,
-                    toConfirm = confirm[2],
-                    onLongClick = { onLongClickItem(2) },
-                    onClick = onMarkAsUnreadClicked,
-                )
-                if (onDownloadClicked != null) {
-                    var downloadExpanded by remember { mutableStateOf(false) }
-                    Button(
-                        title = stringResource(MR.strings.action_download),
-                        icon = MaterialSymbols.Rounded.Download,
-                        toConfirm = confirm[3],
-                        onLongClick = { onLongClickItem(3) },
-                        onClick = { downloadExpanded = !downloadExpanded },
-                    ) {
-                        DownloadDropdownMenu(
-                            expanded = downloadExpanded,
-                            onDismissRequest = { downloadExpanded = false },
-                            onDownloadClicked = onDownloadClicked,
-                            offset = BottomBarMenuDpOffset,
-                        )
+                val haptic = LocalHapticFeedback.current
+                val confirm = remember { mutableStateListOf(false, false, false, false, false, false) }
+                var resetJob by remember { mutableStateOf<Job?>(null) }
+                val onLongClickItem: (Int) -> Unit = { toConfirmIndex ->
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    confirm.indices.forEach { i -> confirm[i] = i == toConfirmIndex }
+                    resetJob?.cancel()
+                    resetJob = scope.launch {
+                        delay(1.seconds)
+                        if (isActive) confirm[toConfirmIndex] = false
                     }
                 }
-                if (!itemOverflow) {
-                    Button(
-                        title = stringResource(MR.strings.migrate),
-                        icon = MaterialSymbols.Rounded.SwapCalls,
-                        toConfirm = confirm[4],
-                        onLongClick = { onLongClickItem(4) },
-                        onClick = onMigrateClicked,
+                val itemOverflow = onDownloadClicked != null
+                Row(
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    LibraryAction(
+                        title = stringResource(MR.strings.action_move_category),
+                        icon = painterResource(R.drawable.ic_vmh_move_category),
+                        toConfirm = confirm[0],
+                        onLongClick = { onLongClickItem(0) },
+                        onClick = onChangeCategoryClicked,
                     )
-                    Button(
-                        title = stringResource(MR.strings.action_delete),
-                        icon = MaterialSymbols.Rounded.Delete,
-                        toConfirm = confirm[5],
-                        onLongClick = { onLongClickItem(5) },
-                        onClick = onDeleteClicked,
+                    LibraryAction(
+                        title = stringResource(MR.strings.action_mark_as_read),
+                        icon = painterResource(R.drawable.ic_vmh_mark_read),
+                        toConfirm = confirm[1],
+                        onLongClick = { onLongClickItem(1) },
+                        onClick = onMarkAsReadClicked,
                     )
-                } else {
-                    var overflowMenuOpen by remember { mutableStateOf(false) }
-                    Button(
-                        title = stringResource(MR.strings.label_more),
-                        icon = MaterialSymbols.Rounded.MoreVert,
-                        toConfirm = false,
-                        onLongClick = {},
-                        onClick = { overflowMenuOpen = true },
-                    ) {
-                        DropdownMenu(
-                            expanded = overflowMenuOpen,
-                            onDismissRequest = { overflowMenuOpen = false },
-                            offset = BottomBarMenuDpOffset,
+                    LibraryAction(
+                        title = stringResource(MR.strings.action_mark_as_unread),
+                        icon = painterResource(R.drawable.ic_vmh_mark_unread),
+                        toConfirm = confirm[2],
+                        onLongClick = { onLongClickItem(2) },
+                        onClick = onMarkAsUnreadClicked,
+                    )
+                    if (onDownloadClicked != null) {
+                        var downloadExpanded by remember { mutableStateOf(false) }
+                        LibraryAction(
+                            title = stringResource(MR.strings.action_download),
+                            icon = painterResource(R.drawable.ic_vmh_download),
+                            toConfirm = confirm[3],
+                            onLongClick = { onLongClickItem(3) },
+                            onClick = { downloadExpanded = !downloadExpanded },
                         ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(MR.strings.migrate)) },
-                                onClick = onMigrateClicked,
+                            DownloadDropdownMenu(
+                                expanded = downloadExpanded,
+                                onDismissRequest = { downloadExpanded = false },
+                                onDownloadClicked = onDownloadClicked,
+                                offset = BottomBarMenuDpOffset,
                             )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(MR.strings.action_delete)) },
-                                onClick = onDeleteClicked,
-                            )
+                        }
+                    }
+                    if (!itemOverflow) {
+                        LibraryAction(
+                            title = stringResource(MR.strings.label_migration),
+                            icon = painterResource(R.drawable.ic_vmh_migrate),
+                            toConfirm = confirm[4],
+                            onLongClick = { onLongClickItem(4) },
+                            onClick = onMigrateClicked,
+                        )
+                        LibraryAction(
+                            title = stringResource(MR.strings.action_delete),
+                            icon = painterResource(R.drawable.ic_vmh_delete),
+                            toConfirm = confirm[5],
+                            onLongClick = { onLongClickItem(5) },
+                            onClick = onDeleteClicked,
+                            destructive = true,
+                        )
+                    } else {
+                        var overflowMenuOpen by remember { mutableStateOf(false) }
+                        LibraryAction(
+                            title = stringResource(MR.strings.label_more),
+                            icon = painterResource(R.drawable.ic_vmh_more),
+                            toConfirm = false,
+                            onLongClick = {},
+                            onClick = { overflowMenuOpen = true },
+                        ) {
+                            DropdownMenu(
+                                expanded = overflowMenuOpen,
+                                onDismissRequest = { overflowMenuOpen = false },
+                                offset = BottomBarMenuDpOffset,
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(MR.strings.label_migration)) },
+                                    onClick = onMigrateClicked,
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.ic_vmh_migrate),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp),
+                                            tint = colors.onSurfaceVariant,
+                                        )
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = stringResource(MR.strings.action_delete),
+                                            color = colors.error,
+                                        )
+                                    },
+                                    onClick = onDeleteClicked,
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.ic_vmh_delete),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp),
+                                            tint = colors.error,
+                                        )
+                                    },
+                                )
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.LibraryAction(
+    title: String,
+    icon: Painter,
+    toConfirm: Boolean,
+    onLongClick: () -> Unit,
+    onClick: () -> Unit,
+    destructive: Boolean = false,
+    trailing: (@Composable () -> Unit)? = null,
+) {
+    val colors = MaterialTheme.colorScheme
+    val accent = if (destructive) colors.error else colors.primary
+    val animatedWeight by animateFloatAsState(
+        targetValue = if (toConfirm) 2f else 1f,
+        label = "weight",
+    )
+    Column(
+        modifier = Modifier.weight(animatedWeight),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .combinedClickable(
+                    interactionSource = null,
+                    indication = ripple(bounded = false),
+                    onLongClick = onLongClick,
+                    onClick = onClick,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(accent.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = icon,
+                    contentDescription = title,
+                    modifier = Modifier.size(20.dp),
+                    tint = accent,
+                )
+            }
+            trailing?.invoke()
+        }
+        AnimatedVisibility(
+            visible = toConfirm,
+            enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+            exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
+        ) {
+            Text(
+                text = title,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 2.dp),
+            )
         }
     }
 }

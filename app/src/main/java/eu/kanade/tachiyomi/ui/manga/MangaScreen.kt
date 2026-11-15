@@ -219,7 +219,6 @@ class MangaScreen(
                 MigrateMangaDialog(
                     current = dialog.current,
                     target = dialog.target,
-                    // Initiated from the context of [dialog.target] so we show [dialog.current].
                     onClickTitle = { navigator.push(MangaScreen(dialog.current.id)) },
                     onDismissRequest = onDismissRequest,
                 )
@@ -341,11 +340,6 @@ class MangaScreen(
         }
     }
 
-    /**
-     * Perform a search using the provided query.
-     *
-     * @param query the search query to the parent controller
-     */
     private suspend fun performSearch(navigator: Navigator, query: String, global: Boolean) {
         if (global) {
             navigator.push(GlobalSearchScreen(query))
@@ -368,11 +362,6 @@ class MangaScreen(
         }
     }
 
-    /**
-     * Performs a genre search using the provided genre name.
-     *
-     * @param genreName the search genre to the parent controller
-     */
     private suspend fun performGenreSearch(navigator: Navigator, genreName: String, source: Source) {
         if (navigator.size < 2) {
             return
@@ -387,9 +376,6 @@ class MangaScreen(
         }
     }
 
-    /**
-     * Copy Manga URL to Clipboard
-     */
     private fun copyMangaUrl(context: Context, manga_: Manga?, source_: Source?) {
         val manga = manga_ ?: return
         val source = source_ as? HttpSource ?: return

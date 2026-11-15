@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import eu.kanade.presentation.reader.appbars.fileteLomo
 import tachiyomi.presentation.core.components.rememberVmhMangaPalette
 
-
 /**
  * Banda de accion principal del detalle de manga.
  *
