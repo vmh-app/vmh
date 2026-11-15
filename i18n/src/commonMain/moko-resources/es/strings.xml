@@ -967,6 +967,16 @@
     <string name="vmh_onb_restore_library">Biblioteca y categorías</string>
     <string name="vmh_onb_restore_history">Historial de lectura y capítulos</string>
     <string name="vmh_onb_restore_settings">Ajustes de la aplicación</string>
+    <string name="vmh_guide_title">Primeros pasos</string>
+    <string name="vmh_guide_intro">Todo lo que necesitas cabe en cuatro pasos. Sin cuenta y sin nada más que configurar.</string>
+    <string name="vmh_guide_step1_title">Abre Extensiones</string>
+    <string name="vmh_guide_step1_desc">En la barra de abajo entra a Fuentes y elige la pestaña Extensiones. El listado de VMH ya viene cargado.</string>
+    <string name="vmh_guide_step2_title">Instala las fuentes</string>
+    <string name="vmh_guide_step2_desc">Elige el sitio que lees y pulsa Instalar. Cada fuente añade uno o varios sitios.</string>
+    <string name="vmh_guide_step3_title">Busca tu serie</string>
+    <string name="vmh_guide_step3_desc">Pulsa la lupa de la barra inferior, elige una fuente y escribe el título. También puedes explorar por género desde Inicio.</string>
+    <string name="vmh_guide_step4_title">Guárdala en tu biblioteca</string>
+    <string name="vmh_guide_step4_desc">Abre la serie y pulsa Añadir a la biblioteca. Desde ahí sigues tu progreso y recibes los capítulos nuevos.</string>
 
     <string name="label_home">Inicio</string>
     <string name="home_latest_updates">Últimas actualizaciones</string>

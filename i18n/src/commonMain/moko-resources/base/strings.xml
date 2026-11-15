@@ -1161,6 +1161,16 @@
     <string name="vmh_onb_restore_library">Library and categories</string>
     <string name="vmh_onb_restore_history">Reading history and chapters</string>
     <string name="vmh_onb_restore_settings">App settings</string>
+    <string name="vmh_guide_title">Getting started</string>
+    <string name="vmh_guide_intro">Everything you need fits in four steps. No account, nothing else to set up.</string>
+    <string name="vmh_guide_step1_title">Open Extensions</string>
+    <string name="vmh_guide_step1_desc">In the bottom bar open Sources and pick the Extensions tab. The VMH store is already loaded.</string>
+    <string name="vmh_guide_step2_title">Install your sources</string>
+    <string name="vmh_guide_step2_desc">Pick the site you read and tap Install. Each source adds one or more sites.</string>
+    <string name="vmh_guide_step3_title">Find your series</string>
+    <string name="vmh_guide_step3_desc">Tap the search icon in the bottom bar, pick a source and type the title. You can also browse genres from Home.</string>
+    <string name="vmh_guide_step4_title">Keep it in your library</string>
+    <string name="vmh_guide_step4_desc">Open the series and tap Add to library. From there you follow your progress and get new chapters.</string>
 
     <string name="label_home">Home</string>
     <string name="home_latest_updates">Latest updates</string>

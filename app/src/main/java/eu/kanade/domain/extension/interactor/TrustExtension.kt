@@ -76,9 +76,14 @@ class TrustExtension(
          * The release keystore of VMH (`vmh-release.jks`) is also the one used to sign the
          * extension store index and its APKs, so any extension carrying this fingerprint is
          * built by us and safe to load.
+         *
+         * The second one is the key the Tachiyomi and Mihon extension repositories sign with.
+         * Extensions are built once and shared by every fork, so a source that works in those
+         * apps is valid here too and must not show up as untrusted.
          */
         private val FIRST_PARTY_SIGNATURES = listOf(
             "6704a01d6528f9547e3b27b5c72b2a6daf96aefb3070c86969d85219c5f0170b",
+            "9add655a78e96c4ec7a53ef89dccb557cb5d767489fac5e785d671a5a75d4da2",
         )
     }
 }

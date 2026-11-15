@@ -26,8 +26,6 @@ import eu.kanade.tachiyomi.R
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
 
-const val GETTING_STARTED_URL = "https://vmh-extensions.gestevezmurillo.workers.dev"
-
 internal class GuidesStep(
     private val onRestoreBackup: () -> Unit,
 ) : OnboardingStep {
