@@ -33,10 +33,18 @@ androidComponents {
 
         val variantName = variant.name.replaceFirstChar { it.uppercase() }
         val task = tasks.register<GenerateLocalesConfigTask>("generate${variantName}LocalesConfig") {
+            // Solo los idiomas traducidos al 100 %: de este archivo salen el selector de la app
+            // y el de Ajustes de Android. Las carpetas incompletas se quedan, pero no se ofrecen.
+            val idiomasCompletos = setOf(
+                "base", "ar", "de", "es", "fil", "fr", "in", "it", "ja", "ko",
+                "pt-rBR", "ru", "tr", "vi", "zh-rCN", "zh-rTW",
+            )
             localeFiles.from(
-                layout.projectDirectory.dir("src/commonMain/moko-resources").asFileTree.matching {
-                    include("**/strings.xml", "**/plurals.xml")
-                },
+                layout.projectDirectory.dir("src/commonMain/moko-resources").asFileTree
+                    .matching {
+                        include("**/strings.xml", "**/plurals.xml")
+                    }
+                    .filter { it.parentFile.name in idiomasCompletos },
             )
         }
         resSource.addGeneratedSourceDirectory(task) { it.outputDir }

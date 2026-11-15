@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import logcat.LogPriority
 import mihon.core.metro.AppCoroutineScope
@@ -52,6 +53,34 @@ class ExtensionStoreRepositoryImpl(
             ),
             replay = 1,
         )
+
+    init {
+        scope.launch { addDefaultStoreIfMissing() }
+    }
+
+    /**
+     * Every VMH install ships with our own extension store, so the extension catalog is available
+     * (and its signing key trusted) without the user pasting a URL.
+     */
+    private suspend fun addDefaultStoreIfMissing() {
+        try {
+            if (database.extension_storeQueries.getCount().awaitAsOne() > 0L) return
+
+            database.extension_storeQueries.upsert(
+                indexUrl = DEFAULT_STORE_INDEX_URL,
+                name = DEFAULT_STORE_NAME,
+                badgeLabel = DEFAULT_STORE_NAME,
+                signingKey = DEFAULT_STORE_SIGNING_KEY,
+                contactWebsite = DEFAULT_STORE_WEBSITE,
+                contactDiscord = null,
+                isLegacy = true,
+                extensionListUrl = null,
+            )
+            logcat { "Added the default VMH extension store" }
+        } catch (e: Exception) {
+            logcat(LogPriority.ERROR, e) { "Failed to add the default extension store" }
+        }
+    }
 
     override suspend fun insert(indexUrl: String): Result<Unit> {
         return service.fetch(indexUrl).mapCatching { upsert(it) }
@@ -171,4 +200,15 @@ class ExtensionStoreRepositoryImpl(
         isLegacy = isLegacy,
         extensionListUrl = extensionListUrl,
     )
+
+    companion object {
+        private const val DEFAULT_STORE_INDEX_URL =
+            "https://vmh-extensions.gestevezmurillo.workers.dev/index.min.json"
+        private const val DEFAULT_STORE_NAME = "VMH"
+        private const val DEFAULT_STORE_WEBSITE = "https://vmh-extensions.gestevezmurillo.workers.dev"
+
+        /** Signing key of the VMH extension store, the same keystore that signs the app. */
+        private const val DEFAULT_STORE_SIGNING_KEY =
+            "6704a01d6528f9547e3b27b5c72b2a6daf96aefb3070c86969d85219c5f0170b"
+    }
 }
