@@ -57,6 +57,10 @@ class MigrateSourceViewModel(
         .flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), State())
 
+    fun setMigrationDestination(sourceId: Long) {
+        preferences.migrationSources.set(listOf(sourceId))
+    }
+
     fun toggleSortingMode() {
         preferences.migrationSortingMode.getAndSet { mode ->
             when (mode) {

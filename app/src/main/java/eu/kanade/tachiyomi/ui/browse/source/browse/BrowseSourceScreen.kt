@@ -1,30 +1,14 @@
 package eu.kanade.tachiyomi.ui.browse.source.browse
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
@@ -51,23 +35,17 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mihon.feature.migration.dialog.MigrateMangaDialog
-import mihon.icons.materialsymbols.MaterialSymbols
-import mihon.icons.materialsymbols.rounded.FilterList
-import mihon.icons.materialsymbols.rounded.Verified
-import mihon.icons.materialsymbols.roundedfilled.Favorite
 import mihon.presentation.core.util.collectAsLazyPagingItems
 import tachiyomi.core.common.Constants
 import tachiyomi.domain.source.model.StubSource
-import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.Scaffold
-import tachiyomi.presentation.core.components.material.padding
-import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.screens.LoadingScreen
 import tachiyomi.source.local.LocalSource
 
 data class BrowseSourceScreen(
     val sourceId: Long,
     private val listingQuery: String?,
+    private val initialGenre: String? = null,
 ) : Screen(), AssistContentScreen {
 
     private var assistUrl: String? = null
@@ -81,6 +59,12 @@ data class BrowseSourceScreen(
                 create(sourceId = sourceId, listingQuery = listingQuery)
             }
         val state by viewModel.state.collectAsState()
+
+        LaunchedEffect(initialGenre, state.source) {
+            if (initialGenre != null && state.source != null) {
+                viewModel.searchGenre(initialGenre)
+            }
+        }
 
         val navigator = LocalNavigator.currentOrThrow
         val navigateUp: () -> Unit = {
@@ -127,89 +111,31 @@ data class BrowseSourceScreen(
 
         Scaffold(
             topBar = {
-                Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .pointerInput(Unit) {},
-                ) {
-                    BrowseSourceToolbar(
-                        searchQuery = state.toolbarQuery,
-                        onSearchQueryChange = viewModel::setToolbarQuery,
-                        source = source,
-                        displayMode = viewModel.displayMode,
-                        onDisplayModeChange = { viewModel.displayMode = it },
-                        navigateUp = navigateUp,
-                        onWebViewClick = onWebViewClick,
-                        onHelpClick = onHelpClick,
-                        onSettingsClick = { navigator.push(SourcePreferencesScreen(sourceId)) },
-                        onSearch = viewModel::search,
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .horizontalScroll(rememberScrollState())
-                            .padding(horizontal = MaterialTheme.padding.small),
-                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
-                    ) {
-                        FilterChip(
-                            selected = state.listing == Listing.Popular,
-                            onClick = {
-                                viewModel.resetFilters()
-                                viewModel.setListing(Listing.Popular)
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = MaterialSymbols.RoundedFilled.Favorite,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(FilterChipDefaults.IconSize),
-                                )
-                            },
-                            label = {
-                                Text(text = stringResource(MR.strings.popular))
-                            },
-                        )
-                        if (source.supportsLatest) {
-                            FilterChip(
-                                selected = state.listing == Listing.Latest,
-                                onClick = {
-                                    viewModel.resetFilters()
-                                    viewModel.setListing(Listing.Latest)
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = MaterialSymbols.Rounded.Verified,
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .size(FilterChipDefaults.IconSize),
-                                    )
-                                },
-                                label = {
-                                    Text(text = stringResource(MR.strings.latest))
-                                },
-                            )
-                        }
-                        if (state.filters.isNotEmpty()) {
-                            FilterChip(
-                                selected = state.listing is Listing.Search,
-                                onClick = viewModel::openFilterSheet,
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = MaterialSymbols.Rounded.FilterList,
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .size(FilterChipDefaults.IconSize),
-                                    )
-                                },
-                                label = {
-                                    Text(text = stringResource(MR.strings.action_filter))
-                                },
-                            )
-                        }
-                    }
-
-                    HorizontalDivider()
-                }
+                BrowseSourceToolbar(
+                    searchQuery = state.toolbarQuery,
+                    onSearchQueryChange = viewModel::setToolbarQuery,
+                    source = source,
+                    displayMode = viewModel.displayMode,
+                    onDisplayModeChange = { viewModel.displayMode = it },
+                    navigateUp = navigateUp,
+                    onWebViewClick = onWebViewClick,
+                    onHelpClick = onHelpClick,
+                    onSettingsClick = { navigator.push(SourcePreferencesScreen(sourceId)) },
+                    onSearch = viewModel::search,
+                    popularSelected = state.listing == Listing.Popular,
+                    latestSelected = state.listing == Listing.Latest,
+                    filterSelected = state.listing is Listing.Search,
+                    showFilter = state.filters.isNotEmpty(),
+                    onPopularClick = {
+                        viewModel.resetFilters()
+                        viewModel.setListing(Listing.Popular)
+                    },
+                    onLatestClick = {
+                        viewModel.resetFilters()
+                        viewModel.setListing(Listing.Latest)
+                    },
+                    onFilterClick = viewModel::openFilterSheet,
+                )
             },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         ) { paddingValues ->

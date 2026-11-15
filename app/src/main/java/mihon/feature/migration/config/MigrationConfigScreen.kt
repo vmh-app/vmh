@@ -1,21 +1,35 @@
 package mihon.feature.migration.config
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallExtendedFloatingActionButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,14 +41,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.StringResource
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -43,8 +62,7 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import dev.zacsweers.metrox.viewmodel.metroViewModel
 import eu.kanade.domain.source.service.SourcePreferences
 import eu.kanade.presentation.browse.components.SourceIcon
-import eu.kanade.presentation.components.AppBar
-import eu.kanade.presentation.components.AppBarActions
+import eu.kanade.presentation.components.VmhContinueBar
 import eu.kanade.presentation.util.Screen
 import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.ui.browse.migration.search.MigrateSearchScreen
@@ -56,9 +74,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mihon.feature.migration.list.MigrationListScreen
 import mihon.icons.materialsymbols.MaterialSymbols
-import mihon.icons.materialsymbols.automirroredrounded.ArrowForward
+import mihon.icons.materialsymbols.automirroredrounded.ArrowBack
+import mihon.icons.materialsymbols.rounded.Check
 import mihon.icons.materialsymbols.rounded.Deselect
 import mihon.icons.materialsymbols.rounded.DragHandle
+import mihon.icons.materialsymbols.rounded.MoreVert
 import mihon.icons.materialsymbols.rounded.SelectAll
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
@@ -68,12 +88,8 @@ import tachiyomi.domain.source.model.Source
 import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.FastScrollLazyColumn
-import tachiyomi.presentation.core.components.Pill
-import tachiyomi.presentation.core.components.material.Scaffold
-import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.screens.LoadingScreen
-import tachiyomi.presentation.core.util.shouldExpandFAB
 
 class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
 
@@ -115,53 +131,23 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
         }
 
         val lazyListState = rememberLazyListState()
-        Scaffold(
-            topBar = {
-                AppBar(
-                    title = null,
-                    navigateUp = navigator::pop,
-                    scrollBehavior = it,
-                    actions = {
-                        AppBarActions(
-                            listOf(
-                                AppBar.Action(
-                                    title = stringResource(MR.strings.migrationConfigScreen_selectAllLabel),
-                                    icon = MaterialSymbols.Rounded.SelectAll,
-                                    onClick = { viewModel.toggleSelection(Model.SelectionConfig.All) },
-                                ),
-                                AppBar.Action(
-                                    title = stringResource(MR.strings.migrationConfigScreen_selectNoneLabel),
-                                    icon = MaterialSymbols.Rounded.Deselect,
-                                    onClick = { viewModel.toggleSelection(Model.SelectionConfig.None) },
-                                ),
-                                AppBar.OverflowAction(
-                                    title = stringResource(MR.strings.migrationConfigScreen_selectEnabledLabel),
-                                    onClick = { viewModel.toggleSelection(Model.SelectionConfig.Enabled) },
-                                ),
-                                AppBar.OverflowAction(
-                                    title = stringResource(MR.strings.migrationConfigScreen_selectPinnedLabel),
-                                    onClick = { viewModel.toggleSelection(Model.SelectionConfig.Pinned) },
-                                ),
-                            ),
-                        )
-                    },
-                )
-            },
-            floatingActionButton = {
-                SmallExtendedFloatingActionButton(
-                    text = { Text(text = stringResource(MR.strings.migrationConfigScreen_continueButtonText)) },
-                    icon = {
-                        Icon(imageVector = MaterialSymbols.AutoMirroredRounded.ArrowForward, contentDescription = null)
-                    },
-                    onClick = {
-                        viewModel.saveSources()
-                        continueMigration(openSheet = true, extraSearchQuery = null)
-                    },
-                    expanded = lazyListState.shouldExpandFAB(),
-                )
-            },
-        ) { contentPadding ->
-            val reorderableState = rememberReorderableLazyListState(lazyListState, contentPadding) { from, to ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        ) {
+            VmhConfigHeader(
+                selected = selectedSources.size,
+                total = state.sources.size,
+                onBack = navigator::pop,
+                onSelectAll = { viewModel.toggleSelection(Model.SelectionConfig.All) },
+                onSelectNone = { viewModel.toggleSelection(Model.SelectionConfig.None) },
+                onSelectEnabled = { viewModel.toggleSelection(Model.SelectionConfig.Enabled) },
+                onSelectPinned = { viewModel.toggleSelection(Model.SelectionConfig.Pinned) },
+            )
+
+            val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
                 val fromIndex = selectedSources.indexOfFirst { it.id == from.key }
                 val toIndex = selectedSources.indexOfFirst { it.id == to.key }
                 if (fromIndex == -1 || toIndex == -1) return@rememberReorderableLazyListState
@@ -169,37 +155,31 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
             }
 
             FastScrollLazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.weight(1f),
                 state = lazyListState,
-                contentPadding = contentPadding,
+                contentPadding = PaddingValues(bottom = 8.dp),
             ) {
                 listOf(selectedSources, availableSources).fastForEachIndexed { listIndex, sources ->
                     val selectedSourceList = listIndex == 0
                     if (sources.isNotEmpty()) {
                         val headerPrefix = if (selectedSourceList) "selected" else "available"
                         item("$headerPrefix-header") {
-                            Text(
-                                text = stringResource(
-                                    resource = if (selectedSourceList) {
-                                        MR.strings.migrationConfigScreen_selectedHeader
-                                    } else {
-                                        MR.strings.migrationConfigScreen_availableHeader
-                                    },
-                                ),
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier
-                                    .padding(MaterialTheme.padding.medium)
-                                    .animateItem(),
+                            VmhSourcesSectionHeader(
+                                labelRes = if (selectedSourceList) {
+                                    MR.strings.migrationConfigScreen_selectedHeader
+                                } else {
+                                    MR.strings.migrationConfigScreen_availableHeader
+                                },
+                                count = sources.size,
+                                modifier = Modifier.animateItem(),
                             )
                         }
                     }
                     itemsIndexed(
                         items = sources,
                         key = { _, item -> item.id },
-                    ) { index, item ->
+                    ) { _, item ->
                         SourceItemContainer(
-                            firstItem = index == 0,
-                            lastItem = index == (sources.size - 1),
                             source = item,
                             showLanguage = showLanguage,
                             dragEnabled = selectedSourceList && sources.size > 1,
@@ -210,6 +190,18 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
                     }
                 }
             }
+
+            VmhContinueBar(
+                enabled = true,
+                onClick = {
+                    viewModel.saveSources()
+                    continueMigration(openSheet = true, extraSearchQuery = null)
+                },
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp)
+                    .navigationBarsPadding()
+                    .padding(bottom = 12.dp),
+            )
         }
 
         if (migrationSheetOpen) {
@@ -226,8 +218,6 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
 
     @Composable
     private fun LazyItemScope.SourceItemContainer(
-        firstItem: Boolean,
-        lastItem: Boolean,
         source: MigrationSource,
         showLanguage: Boolean,
         dragEnabled: Boolean,
@@ -235,81 +225,307 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
         key: (MigrationSource) -> Any,
         onClick: () -> Unit,
     ) {
-        val shape = remember(firstItem, lastItem) {
-            val top = if (firstItem) 12.dp else 0.dp
-            val bottom = if (lastItem) 12.dp else 0.dp
-            RoundedCornerShape(top, top, bottom, bottom)
-        }
-
         ReorderableItem(
             state = state,
             key = key(source),
             enabled = dragEnabled,
         ) { _ ->
-            ElevatedCard(
-                shape = shape,
-                modifier = Modifier
-                    .padding(horizontal = MaterialTheme.padding.medium)
-                    .animateItem(),
-            ) {
-                SourceItem(
-                    source = source,
-                    showLanguage = showLanguage,
-                    dragEnabled = dragEnabled,
-                    scope = this@ReorderableItem,
-                    onClick = onClick,
-                )
-            }
-        }
-
-        if (!lastItem) {
-            HorizontalDivider(modifier = Modifier.padding(horizontal = MaterialTheme.padding.medium))
+            VmhSourceCard(
+                source = source,
+                showLanguage = showLanguage,
+                selected = source.isSelected,
+                dragEnabled = dragEnabled,
+                modifier = Modifier.animateItem(),
+                scope = this@ReorderableItem,
+                onClick = onClick,
+            )
         }
     }
 
     @Composable
-    private fun SourceItem(
+    private fun VmhSourceCard(
         source: MigrationSource,
         showLanguage: Boolean,
+        selected: Boolean,
         dragEnabled: Boolean,
+        modifier: Modifier = Modifier,
         scope: ReorderableCollectionItemScope,
         onClick: () -> Unit,
     ) {
-        ListItem(
-            modifier = Modifier.clickable(onClick = onClick),
-            trailingContent = if (dragEnabled) {
-                {
+        val colors = MaterialTheme.colorScheme
+
+        Surface(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .clickable(onClick = onClick),
+            shape = RoundedCornerShape(17.dp),
+            color = colors.surface,
+            border = BorderStroke(
+                1.dp,
+                if (selected) colors.primary.copy(alpha = 0.55f) else colors.outlineVariant,
+            ),
+            shadowElevation = 2.dp,
+        ) {
+            Row(
+                modifier = Modifier
+                    .height(IntrinsicSize.Min)
+                    .padding(
+                        start = if (selected) 0.dp else 12.dp,
+                        top = 10.dp,
+                        bottom = 10.dp,
+                        end = 10.dp,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (selected) {
+                    Box(
+                        modifier = Modifier
+                            .width(3.dp)
+                            .fillMaxHeight()
+                            .background(colors.primary),
+                    )
+                    Spacer(Modifier.width(9.dp))
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(RoundedCornerShape(13.dp)),
+                ) {
+                    SourceIcon(source = source.source, modifier = Modifier.matchParentSize())
+                }
+
+                Spacer(Modifier.width(12.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Text(
+                        text = source.name,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    if (showLanguage) {
+                        Text(
+                            text = LocaleHelper.getShortDisplayName(source.shortLanguage, uppercase = true),
+                            maxLines = 1,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.onSurfaceVariant,
+                        )
+                    }
+                }
+
+                Spacer(Modifier.width(8.dp))
+
+                if (dragEnabled) {
                     Icon(
                         imageVector = MaterialSymbols.Rounded.DragHandle,
                         contentDescription = null,
                         modifier = with(scope) {
-                            Modifier.draggableHandle()
+                            Modifier
+                                .size(24.dp)
+                                .draggableHandle()
                         },
+                        tint = colors.onSurfaceVariant,
                     )
+                    Spacer(Modifier.width(8.dp))
                 }
-            } else {
-                null
-            },
-            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+
+                VmhSelectionCircle(selected = selected)
+            }
+        }
+    }
+
+    @Composable
+    private fun VmhConfigHeader(
+        selected: Int,
+        total: Int,
+        onBack: () -> Unit,
+        onSelectAll: () -> Unit,
+        onSelectNone: () -> Unit,
+        onSelectEnabled: () -> Unit,
+        onSelectPinned: () -> Unit,
+    ) {
+        val colors = MaterialTheme.colorScheme
+        var menuOpen by remember { mutableStateOf(false) }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 10.dp),
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                SourceIcon(source = source.source)
-                Text(
-                    text = source.name,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f),
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                VmhCircleAction(
+                    icon = MaterialSymbols.AutoMirroredRounded.ArrowBack,
+                    description = stringResource(MR.strings.action_bar_up_description),
+                    onClick = onBack,
                 )
-                if (showLanguage) {
-                    Pill(
-                        text = LocaleHelper.getShortDisplayName(source.shortLanguage, uppercase = true),
-                        style = MaterialTheme.typography.bodySmall,
+                Spacer(Modifier.weight(1f))
+                VmhCircleAction(
+                    icon = MaterialSymbols.Rounded.SelectAll,
+                    description = stringResource(MR.strings.migrationConfigScreen_selectAllLabel),
+                    onClick = onSelectAll,
+                )
+                Spacer(Modifier.width(8.dp))
+                VmhCircleAction(
+                    icon = MaterialSymbols.Rounded.Deselect,
+                    description = stringResource(MR.strings.migrationConfigScreen_selectNoneLabel),
+                    onClick = onSelectNone,
+                )
+                Spacer(Modifier.width(8.dp))
+                Box {
+                    VmhCircleAction(
+                        icon = MaterialSymbols.Rounded.MoreVert,
+                        description = null,
+                        onClick = { menuOpen = true },
                     )
+                    DropdownMenu(
+                        expanded = menuOpen,
+                        onDismissRequest = { menuOpen = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(MR.strings.migrationConfigScreen_selectEnabledLabel)) },
+                            onClick = {
+                                menuOpen = false
+                                onSelectEnabled()
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(MR.strings.migrationConfigScreen_selectPinnedLabel)) },
+                            onClick = {
+                                menuOpen = false
+                                onSelectPinned()
+                            },
+                        )
+                    }
                 }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            Text(
+                text = stringResource(MR.strings.label_migration).uppercase(),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    letterSpacing = 2.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+                color = colors.primary,
+            )
+            Text(
+                text = stringResource(MR.strings.vmh_migration_destinations),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = stringResource(MR.strings.vmh_migration_sources_ratio, selected, total),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp, bottom = 4.dp),
+            )
+        }
+    }
+
+    @Composable
+    private fun VmhCircleAction(
+        icon: ImageVector,
+        description: String?,
+        onClick: () -> Unit,
+    ) {
+        val colors = MaterialTheme.colorScheme
+
+        Surface(
+            onClick = onClick,
+            modifier = Modifier.size(40.dp),
+            shape = CircleShape,
+            color = colors.surface,
+            contentColor = colors.onSurfaceVariant,
+            border = BorderStroke(1.dp, colors.outlineVariant),
+            shadowElevation = 2.dp,
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = description,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun VmhSourcesSectionHeader(
+        labelRes: StringResource,
+        count: Int,
+        modifier: Modifier = Modifier,
+    ) {
+        val colors = MaterialTheme.colorScheme
+
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 14.dp, top = 16.dp, bottom = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(labelRes).uppercase(),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    letterSpacing = 2.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+                color = colors.onSurfaceVariant,
+            )
+            Spacer(Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(colors.primary.copy(alpha = 0.12f))
+                    .padding(horizontal = 6.dp, vertical = 2.dp),
+            ) {
+                Text(
+                    text = count.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.primary,
+                )
+            }
+            Spacer(Modifier.width(10.dp))
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(1.dp)
+                    .background(colors.outlineVariant.copy(alpha = 0.7f)),
+            )
+        }
+    }
+
+    @Composable
+    private fun VmhSelectionCircle(selected: Boolean) {
+        val colors = MaterialTheme.colorScheme
+
+        Box(
+            modifier = Modifier
+                .size(22.dp)
+                .clip(CircleShape)
+                .background(if (selected) colors.primary else Color.Transparent)
+                .border(
+                    width = 1.5.dp,
+                    color = if (selected) colors.primary else colors.outlineVariant,
+                    shape = CircleShape,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (selected) {
+                Icon(
+                    imageVector = MaterialSymbols.Rounded.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = colors.onPrimary,
+                )
             }
         }
     }
@@ -393,7 +609,8 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
 
         fun toggleSelection(config: SelectionConfig) {
             val pinnedSources = sourcePreferences.pinnedSources.get().mapNotNull { it.toLongOrNull() }
-            val disabledSources = sourcePreferences.disabledSources.get().mapNotNull { it.toLongOrNull() }
+            val disabledSources = sourcePreferences.disabledSources.get()
+                .mapNotNull { it.toLongOrNull() }
             val isSelected: (Long) -> Boolean = {
                 when (config) {
                     SelectionConfig.All -> true

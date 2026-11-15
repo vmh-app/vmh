@@ -14,6 +14,7 @@ import eu.kanade.tachiyomi.util.system.LocaleHelper
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.screens.EmptyArt
 import tachiyomi.presentation.core.screens.EmptyScreen
 
 @Composable
@@ -35,6 +36,7 @@ fun ExtensionFilterScreen(
             EmptyScreen(
                 stringRes = MR.strings.empty_screen,
                 modifier = Modifier.padding(contentPadding),
+                art = EmptyArt.SEARCH,
             )
             return@Scaffold
         }

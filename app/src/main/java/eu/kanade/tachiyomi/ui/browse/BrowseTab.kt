@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import dev.zacsweers.metrox.viewmodel.metroViewModel
@@ -19,7 +19,6 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.ui.browse.extension.ExtensionsViewModel
 import eu.kanade.tachiyomi.ui.browse.extension.extensionsTab
 import eu.kanade.tachiyomi.ui.browse.migration.sources.migrateSourceTab
-import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchScreen
 import eu.kanade.tachiyomi.ui.browse.source.sourcesTab
 import eu.kanade.tachiyomi.ui.main.MainActivity
 import kotlinx.coroutines.channels.BufferOverflow
@@ -33,20 +32,11 @@ data object BrowseTab : Tab {
 
     override val options: TabOptions
         @Composable
-        get() {
-            val isSelected = LocalTabNavigator.current.current.key == key
-            val enter = AnimatedImageVector.animatedVectorResource(R.drawable.animated_browse_enter)
-            val exit = AnimatedImageVector.animatedVectorResource(R.drawable.animated_browse_exit)
-            return TabOptions(
-                index = 3u,
-                title = stringResource(MR.strings.browse),
-                icon = rememberAnimatedVectorPainter(enter, exit, isSelected),
-            )
-        }
-
-    override suspend fun onReselect(navigator: Navigator) {
-        navigator.push(GlobalSearchScreen())
-    }
+        get() = TabOptions(
+            index = 3u,
+            title = stringResource(MR.strings.label_sources),
+            icon = painterResource(R.drawable.ic_vmh_nav_sources),
+        )
 
     private val switchToExtensionTabChannel = Channel<Unit>(1, BufferOverflow.DROP_OLDEST)
 

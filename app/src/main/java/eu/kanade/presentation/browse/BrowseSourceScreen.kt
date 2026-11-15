@@ -30,6 +30,7 @@ import tachiyomi.domain.source.model.StubSource
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.screens.EmptyArt
 import tachiyomi.presentation.core.screens.EmptyScreen
 import tachiyomi.presentation.core.screens.EmptyScreenAction
 import tachiyomi.presentation.core.screens.LoadingScreen
@@ -84,6 +85,7 @@ fun BrowseSourceContent(
                 is LoadState.Error -> getErrorMessage(errorState)
                 else -> stringResource(MR.strings.no_results_found)
             },
+            art = if (errorState is LoadState.Error) EmptyArt.SAD else EmptyArt.SEARCH,
             actions = if (source is LocalSource) {
                 listOf(
                     EmptyScreenAction(
@@ -163,6 +165,7 @@ internal fun MissingSourceScreen(
         EmptyScreen(
             message = stringResource(MR.strings.source_not_installed, source.toString()),
             modifier = Modifier.padding(paddingValues),
+            art = EmptyArt.SAD,
         )
     }
 }

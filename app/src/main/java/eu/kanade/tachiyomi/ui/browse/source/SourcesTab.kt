@@ -9,6 +9,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.zacsweers.metrox.viewmodel.metroViewModel
 import eu.kanade.presentation.browse.SourceOptionsDialog
+import eu.kanade.presentation.browse.SourceUiModel
 import eu.kanade.presentation.browse.SourcesScreen
 import eu.kanade.presentation.components.AppBar
 import eu.kanade.presentation.components.TabContent
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mihon.icons.materialsymbols.MaterialSymbols
 import mihon.icons.materialsymbols.rounded.FilterList
-import mihon.icons.materialsymbols.rounded.TravelExplore
+import mihon.icons.materialsymbols.rounded.Search
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
 
@@ -28,12 +29,27 @@ fun Screen.sourcesTab(): TabContent {
     val viewModel = metroViewModel<SourcesViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    val sourceCount = state.items
+        .filterIsInstance<SourceUiModel.Item>()
+        .distinctBy { it.source.id }
+        .count()
+    val languageCount = state.items.count {
+        it is SourceUiModel.Header &&
+            it.language != SourcesViewModel.LAST_USED_KEY &&
+            it.language != SourcesViewModel.PINNED_KEY
+    }
+
     return TabContent(
         titleRes = MR.strings.label_sources,
+        subtitleText = if (sourceCount > 0) {
+            stringResource(MR.strings.vmh_sources_summary, sourceCount, languageCount)
+        } else {
+            stringResource(MR.strings.vmh_sources_subtitle)
+        },
         actions = listOf(
             AppBar.Action(
                 title = stringResource(MR.strings.action_global_search),
-                icon = MaterialSymbols.Rounded.TravelExplore,
+                icon = MaterialSymbols.Rounded.Search,
                 onClick = { navigator.push(GlobalSearchScreen()) },
             ),
             AppBar.Action(
