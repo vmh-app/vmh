@@ -7,18 +7,18 @@ import eu.kanade.tachiyomi.ui.reader.viewer.Viewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.L2RPagerViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.VerticalPagerViewer
+import eu.kanade.tachiyomi.ui.reader.viewer.webgpu.WebGpuFallback
 import eu.kanade.tachiyomi.ui.reader.viewer.webgpu.WebGpuViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.webgpu.WebGpuViewerContinuous
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
 import mihon.app.di.appGraph
 import mihon.icons.custommaterialsymbols.CustomMaterialSymbols
+import mihon.icons.custommaterialsymbols.rounded.ModeDefault
 import mihon.icons.custommaterialsymbols.rounded.ReaderLeftToRight
 import mihon.icons.custommaterialsymbols.rounded.ReaderLongStrip
 import mihon.icons.custommaterialsymbols.rounded.ReaderLongStripGaps
 import mihon.icons.custommaterialsymbols.rounded.ReaderRightToLeft
 import mihon.icons.custommaterialsymbols.rounded.ReaderVertical
-import mihon.icons.materialsymbols.MaterialSymbols
-import mihon.icons.materialsymbols.rounded.MobileGear
 import tachiyomi.i18n.MR
 
 enum class ReadingMode(
@@ -28,7 +28,7 @@ enum class ReadingMode(
     val direction: Direction? = null,
     val type: ViewerType? = null,
 ) {
-    DEFAULT(MR.strings.label_default, MaterialSymbols.Rounded.MobileGear, 0x00000000),
+    DEFAULT(MR.strings.label_default, CustomMaterialSymbols.Rounded.ModeDefault, 0x00000000),
     LEFT_TO_RIGHT(
         MR.strings.left_to_right_viewer,
         CustomMaterialSymbols.Rounded.ReaderLeftToRight,
@@ -77,7 +77,7 @@ enum class ReadingMode(
         }
 
         fun toViewer(preference: Int?, activity: ReaderActivity): Viewer {
-            if (activity.appGraph.basePreferences.highQualityRenderer.get()) {
+            if (activity.appGraph.basePreferences.highQualityRenderer.get() && !WebGpuFallback.isActive) {
                 return when (fromPreference(preference)) {
                     LEFT_TO_RIGHT -> WebGpuViewer(activity, isReversed = false, isVertical = false)
                     RIGHT_TO_LEFT -> WebGpuViewer(activity, isReversed = true, isVertical = false)

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -84,10 +85,38 @@ fun VmhSeccionTitulo(text: String) {
 }
 
 /**
+ * Encabezado de grupo del dialogo del lector: agrupa varias secciones sin filete.
+ *
+ * Sin filete y en tono secundario para que no compita con [VmhSeccionTitulo]: cuando los dos
+ * compartian estilo, un grupo sin controles propios ("WebGPU") se leia como una seccion vacia.
+ */
+@Composable
+fun VmhSeccionGrupo(labelRes: StringResource) {
+    val palette = rememberVmhLectorPalette()
+    Text(
+        text = stringResource(labelRes).uppercase(Locale.getDefault()),
+        style = MaterialTheme.typography.labelSmall,
+        color = palette.acento.copy(alpha = 0.70f),
+        fontWeight = FontWeight.Medium,
+        letterSpacing = 1.6.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 2.dp),
+    )
+}
+
+/**
  * Chip de opcion del dialogo del lector.
  *
- * - Seleccionado: superficie de marca (tinta en oscuro) con texto de alto contraste.
- * - No seleccionado: fondo transparente, texto en el color del tema, borde de acento.
+ * - Seleccionado: relleno de acento al 14 % con borde y texto de acento en seminegrita.
+ * - No seleccionado: fondo transparente, borde y texto neutros del tema.
+ *
+ * Antes el seleccionado se rellenaba con [VmhLectorPalette.superficie], que en tema claro es
+ * `surfaceContainer`: casi el mismo blanco de la hoja. Medido en la captura del dialogo: el chip
+ * activo y los inactivos se veian identicos. El relleno de acento marca la seleccion en los dos
+ * temas sin salirse de la paleta.
  */
 @Composable
 fun VmhChip(
@@ -96,20 +125,24 @@ fun VmhChip(
     label: @Composable () -> Unit,
 ) {
     val palette = rememberVmhLectorPalette()
-    val bgColor = if (selected) palette.superficie else Color.Transparent
-    val textColor = if (selected) palette.texto else MaterialTheme.colorScheme.onSurface
-    val borderColor = if (selected) palette.superficie else palette.acento
+    val bgColor = if (selected) palette.acento.copy(alpha = 0.14f) else Color.Transparent
+    val textColor = if (selected) palette.acento else MaterialTheme.colorScheme.onSurfaceVariant
+    val borderColor = if (selected) palette.acento else MaterialTheme.colorScheme.outlineVariant
+    val borderWidth = if (selected) 1.5.dp else 1.dp
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .clickable(onClick = onClick)
             .background(bgColor, vmhChipShape)
-            .border(1.dp, borderColor, vmhChipShape)
+            .border(borderWidth, borderColor, vmhChipShape)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         androidx.compose.material3.ProvideTextStyle(
-            MaterialTheme.typography.labelMedium.copy(color = textColor),
+            MaterialTheme.typography.labelMedium.copy(
+                color = textColor,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            ),
         ) {
             label()
         }
@@ -158,13 +191,13 @@ fun VmhIconToggleButton(
     modifier: Modifier = Modifier,
 ) {
     val palette = rememberVmhLectorPalette()
-    val containerColor = if (checked) palette.superficie else Color.Transparent
-    val contentColor = if (checked) palette.texto else MaterialTheme.colorScheme.onSurface
-    val borderColor = if (checked) palette.superficie else palette.acento
+    val containerColor = if (checked) palette.acento.copy(alpha = 0.14f) else Color.Transparent
+    val contentColor = if (checked) palette.acento else MaterialTheme.colorScheme.onSurfaceVariant
+    val borderColor = if (checked) palette.acento else MaterialTheme.colorScheme.outlineVariant
 
     Surface(
         modifier = modifier
-            .height(48.dp)
+            .heightIn(min = 48.dp)
             .clickable { onCheckedChange(!checked) },
         shape = RoundedCornerShape(16.dp),
         color = containerColor,

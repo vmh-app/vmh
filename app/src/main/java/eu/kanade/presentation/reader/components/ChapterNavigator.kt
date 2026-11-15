@@ -1,6 +1,8 @@
 package eu.kanade.presentation.reader.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Box
@@ -13,16 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalSlider
 import androidx.compose.material3.rememberSliderState
@@ -36,20 +37,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import eu.kanade.presentation.reader.appbars.VmhLectorPalette
 import eu.kanade.presentation.reader.appbars.rememberVmhLectorPalette
 import eu.kanade.presentation.util.isTabletUi
 import mihon.icons.custommaterialsymbols.CustomMaterialSymbols
 import mihon.icons.custommaterialsymbols.rounded.ChapterNext
 import mihon.icons.custommaterialsymbols.rounded.ChapterPrev
 import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.components.material.VmhVerticalSliderThumb
+import tachiyomi.presentation.core.components.material.VmhVerticalSliderTrack
 import tachiyomi.presentation.core.i18n.stringResource
 import kotlin.math.roundToInt
 
@@ -100,10 +105,6 @@ fun ChapterNavigator(
     val isTabletUi = isTabletUi()
     val mainAxisPadding = if (isTabletUi) 24.dp else 8.dp
     val palette = rememberVmhLectorPalette()
-    val buttonColor = IconButtonDefaults.filledIconButtonColors(
-        containerColor = Color.Transparent,
-        disabledContainerColor = Color.Transparent,
-    )
     val onPageChange: (Int) -> Unit = { onPageIndexChange(it - 1) }
 
     if (type.isHorizontal()) {
@@ -134,8 +135,6 @@ fun ChapterNavigator(
             onPageChangeFinished = onPageIndexChangeFinished,
             interactionSource = interactionSource,
             mainAxisPadding = mainAxisPadding,
-            backgroundColor = palette.superficie,
-            buttonColor = buttonColor,
             modifier = modifier,
         )
     }
@@ -276,38 +275,41 @@ fun VerticalChapterNavigator(
     onPageChangeFinished: () -> Unit,
     interactionSource: MutableInteractionSource,
     mainAxisPadding: Dp,
-    backgroundColor: Color,
-    buttonColor: IconButtonColors,
     modifier: Modifier = Modifier,
 ) {
+    val palette = rememberVmhLectorPalette()
     Column(
         modifier = modifier
             .fillMaxHeight()
+            .width(NAVIGATOR_WIDTH)
             .padding(vertical = mainAxisPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        FilledIconButton(
+        NavigatorArrow(
+            icon = CustomMaterialSymbols.Rounded.ChapterPrev,
+            description = stringResource(MR.strings.action_previous_chapter),
             enabled = enabledPrevious,
             onClick = onPreviousChapter,
-            colors = buttonColor,
-        ) {
-            Icon(
-                imageVector = CustomMaterialSymbols.Rounded.ChapterPrev,
-                contentDescription = stringResource(MR.strings.action_previous_chapter),
-                modifier = Modifier.rotate(90f),
-            )
-        }
+            palette = palette,
+        )
 
         if (state != null) {
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(backgroundColor)
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = 6.dp)
+                    .clip(NavigatorShape)
+                    .background(palette.superficie)
+                    .border(1.dp, palette.separador, NavigatorShape)
+                    .padding(horizontal = 6.dp, vertical = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = currentPage.toString())
+                Text(
+                    text = currentPage.toString(),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = palette.texto,
+                )
 
                 VerticalSlider(
                     state = state,
@@ -317,23 +319,67 @@ fun VerticalChapterNavigator(
                     onValueChange = { onPageChange(it.roundToInt()) },
                     onValueChangeFinished = onPageChangeFinished,
                     interactionSource = interactionSource,
+                    thumb = { VmhVerticalSliderThumb(color = palette.progresoActivo) },
+                    track = { sliderState ->
+                        VmhVerticalSliderTrack(
+                            state = sliderState,
+                            valueRange = 1f..totalPages.toFloat(),
+                            activeColor = palette.progresoActivo,
+                            inactiveColor = palette.progresoPista,
+                        )
+                    },
                 )
 
-                Text(text = totalPages.toString())
+                Text(
+                    text = totalPages.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = palette.acento,
+                )
             }
         } else {
             Spacer(Modifier.weight(1f))
         }
 
-        FilledIconButton(
+        NavigatorArrow(
+            icon = CustomMaterialSymbols.Rounded.ChapterNext,
+            description = stringResource(MR.strings.action_next_chapter),
             enabled = enabledNext,
             onClick = onNextChapter,
-            colors = buttonColor,
-        ) {
+            palette = palette,
+        )
+    }
+}
+
+private val NavigatorShape = RoundedCornerShape(22.dp)
+
+private val NAVIGATOR_WIDTH = 56.dp
+
+@Composable
+private fun NavigatorArrow(
+    icon: ImageVector,
+    description: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    palette: VmhLectorPalette,
+) {
+    // Sobre la superficie de la capsula y no sobre la pagina: en paginas oscuras la flecha
+    // azul suelta se perdia y el cambio de capitulo quedaba invisible.
+    Surface(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.size(38.dp),
+        shape = CircleShape,
+        color = palette.superficie,
+        border = BorderStroke(1.dp, palette.separador),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = CustomMaterialSymbols.Rounded.ChapterNext,
-                contentDescription = stringResource(MR.strings.action_next_chapter),
-                modifier = Modifier.rotate(90f),
+                imageVector = icon,
+                contentDescription = description,
+                modifier = Modifier
+                    .size(18.dp)
+                    .rotate(90f),
+                tint = palette.acento.copy(alpha = if (enabled) 1f else 0.38f),
             )
         }
     }

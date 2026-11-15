@@ -1,41 +1,51 @@
 package eu.kanade.presentation.reader
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import eu.kanade.presentation.reader.appbars.rememberVmhLectorPalette
 import eu.kanade.presentation.theme.TachiyomiPreviewTheme
 import eu.kanade.tachiyomi.ui.reader.model.ChapterTransition
 import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
-import mihon.icons.materialsymbols.MaterialSymbols
-import mihon.icons.materialsymbols.rounded.Info
-import mihon.icons.materialsymbols.roundedfilled.CheckCircle
-import mihon.icons.materialsymbols.roundedfilled.Warning
+import mihon.icons.custommaterialsymbols.CustomMaterialSymbols
+import mihon.icons.custommaterialsymbols.rounded.ChapterNext
+import mihon.icons.custommaterialsymbols.rounded.CheckCircle
+import mihon.icons.custommaterialsymbols.rounded.Info
+import mihon.icons.custommaterialsymbols.rounded.Warning
 import tachiyomi.domain.chapter.model.Chapter
 import tachiyomi.domain.chapter.service.calculateChapterGap
 import tachiyomi.i18n.MR
@@ -93,48 +103,130 @@ private fun TransitionText(
     fallbackLabel: String,
     chapterGap: Int,
 ) {
-    Column(
+    val palette = rememberVmhLectorPalette()
+    Surface(
         modifier = Modifier
             .widthIn(max = 460.dp)
             .fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = palette.superficie,
+        border = BorderStroke(1.dp, palette.separador),
     ) {
-        if (topChapter != null) {
-            ChapterText(
-                header = topLabel,
-                name = topChapter.name,
-                scanlator = topChapter.scanlator,
-                downloaded = topChapterDownloaded,
-            )
+        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp)) {
+            if (topChapter != null && bottomChapter != null) {
+                // Hilo vertical de 2 dp que une las dos fichas: corre por la columna de pocetas y el
+                // bloque de abajo se pega a el, asi el hilo termina justo en la poceta siguiente.
+                ChapterRow(
+                    header = topLabel,
+                    name = topChapter.name,
+                    scanlator = topChapter.scanlator,
+                    downloaded = topChapterDownloaded,
+                    imageVector = CustomMaterialSymbols.Rounded.CheckCircle,
+                    withConnector = true,
+                    trailingContent = if (chapterGap > 0) {
+                        { ChapterGapWarning(gapCount = chapterGap) }
+                    } else {
+                        null
+                    },
+                )
+                ChapterRow(
+                    header = bottomLabel,
+                    name = bottomChapter.name,
+                    scanlator = bottomChapter.scanlator,
+                    downloaded = bottomChapterDownloaded,
+                    imageVector = CustomMaterialSymbols.Rounded.ChapterNext,
+                )
+            } else {
+                if (topChapter != null) {
+                    ChapterRow(
+                        header = topLabel,
+                        name = topChapter.name,
+                        scanlator = topChapter.scanlator,
+                        downloaded = topChapterDownloaded,
+                        imageVector = null,
+                    )
+                } else {
+                    NoChapterNotification(text = fallbackLabel)
+                }
+                Spacer(modifier = Modifier.height(14.dp))
+                if (bottomChapter != null) {
+                    ChapterRow(
+                        header = bottomLabel,
+                        name = bottomChapter.name,
+                        scanlator = bottomChapter.scanlator,
+                        downloaded = bottomChapterDownloaded,
+                        imageVector = null,
+                    )
+                } else {
+                    NoChapterNotification(text = fallbackLabel)
+                }
+            }
+        }
+    }
+}
 
-            Spacer(Modifier.height(VerticalSpacerSize))
-        } else {
-            NoChapterNotification(
-                text = fallbackLabel,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            )
+@Composable
+private fun ChapterRow(
+    header: String,
+    name: String,
+    scanlator: String?,
+    downloaded: Boolean,
+    imageVector: ImageVector?,
+    withConnector: Boolean = false,
+    trailingContent: (@Composable () -> Unit)? = null,
+) {
+    val palette = rememberVmhLectorPalette()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+    ) {
+        if (imageVector != null) {
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
+                        .background(palette.acento.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = imageVector,
+                        tint = palette.acento,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+                if (withConnector) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .width(2.dp)
+                            .clip(RoundedCornerShape(1.dp))
+                            .background(palette.acento.copy(alpha = 0.30f)),
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(14.dp))
         }
 
-        if (bottomChapter != null) {
-            if (chapterGap > 0) {
-                ChapterGapWarning(
-                    gapCount = chapterGap,
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                )
-            }
-
-            Spacer(Modifier.height(VerticalSpacerSize))
-
+        Column(modifier = Modifier.weight(1f)) {
             ChapterText(
-                header = bottomLabel,
-                name = bottomChapter.name,
-                scanlator = bottomChapter.scanlator,
-                downloaded = bottomChapterDownloaded,
+                header = header,
+                name = name,
+                scanlator = scanlator,
+                downloaded = downloaded,
             )
-        } else {
-            NoChapterNotification(
-                text = fallbackLabel,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            )
+            if (trailingContent != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                trailingContent()
+            }
+            if (withConnector) {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }
@@ -144,27 +236,19 @@ private fun NoChapterNotification(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    OutlinedCard(
-        modifier = modifier,
-        colors = CardColor,
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                imageVector = MaterialSymbols.Rounded.Info,
-                tint = MaterialTheme.colorScheme.primary,
-                contentDescription = null,
-            )
-
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
+        IconBadge(
+            imageVector = CustomMaterialSymbols.Rounded.Info,
+            tint = MaterialTheme.colorScheme.primary,
+        )
+        Spacer(modifier = Modifier.size(12.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 
@@ -173,39 +257,41 @@ private fun ChapterGapWarning(
     gapCount: Int,
     modifier: Modifier = Modifier,
 ) {
-    OutlinedCard(
-        modifier = modifier,
-        colors = CardColor,
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                imageVector = MaterialSymbols.RoundedFilled.Warning,
-                tint = MaterialTheme.colorScheme.error,
-                contentDescription = null,
-            )
-
-            Text(
-                text = pluralStringResource(MR.plurals.missing_chapters_warning, count = gapCount, gapCount),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
+        IconBadge(
+            imageVector = CustomMaterialSymbols.Rounded.Warning,
+            tint = MaterialTheme.colorScheme.error,
+        )
+        Spacer(modifier = Modifier.size(12.dp))
+        Text(
+            text = pluralStringResource(MR.plurals.missing_chapters_warning, count = gapCount, gapCount),
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 
 @Composable
-private fun ChapterHeaderText(
-    text: String,
-    modifier: Modifier = Modifier,
+private fun IconBadge(
+    imageVector: ImageVector,
+    tint: Color,
 ) {
-    Text(
-        text = text,
-        modifier = modifier,
-        style = MaterialTheme.typography.titleMedium,
-    )
+    Box(
+        modifier = Modifier
+            .size(34.dp)
+            .clip(CircleShape)
+            .background(tint.copy(alpha = 0.12f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = imageVector,
+            tint = tint,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+        )
+    }
 }
 
 @Composable
@@ -215,11 +301,24 @@ private fun ChapterText(
     scanlator: String?,
     downloaded: Boolean,
 ) {
+    val palette = rememberVmhLectorPalette()
     Column {
-        ChapterHeaderText(
-            text = header,
-            modifier = Modifier.padding(bottom = 4.dp),
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(width = 16.dp, height = 2.dp)
+                    .background(palette.acento, RoundedCornerShape(2.dp)),
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(
+                text = header.uppercase(),
+                style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.8.sp),
+                fontWeight = FontWeight.Bold,
+                color = palette.acento,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -233,6 +332,7 @@ private fun ChapterText(
             maxLines = 5,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
             inlineContent = mapOf(
                 DOWNLOADED_ICON_ID to InlineTextContent(
                     Placeholder(
@@ -242,8 +342,9 @@ private fun ChapterText(
                     ),
                 ) {
                     Icon(
-                        imageVector = MaterialSymbols.RoundedFilled.CheckCircle,
+                        imageVector = CustomMaterialSymbols.Rounded.CheckCircle,
                         contentDescription = stringResource(MR.strings.label_downloaded),
+                        tint = palette.acento,
                     )
                 },
             ),
@@ -263,14 +364,6 @@ private fun ChapterText(
     }
 }
 
-private val CardColor: CardColors
-    @Composable
-    get() = CardDefaults.outlinedCardColors(
-        containerColor = Color.Transparent,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-    )
-
-private val VerticalSpacerSize = 24.dp
 private const val DOWNLOADED_ICON_ID = "downloaded"
 
 private fun previewChapter(name: String, scanlator: String, chapterNumber: Double) = Chapter.create().copy(

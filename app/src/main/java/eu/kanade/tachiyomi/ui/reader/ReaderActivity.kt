@@ -64,6 +64,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import ca.mpreg.webgpuviewer.renderer.WebGpuRenderer
 import dev.zacsweers.metro.Inject
 import eu.kanade.domain.base.BasePreferences
 import eu.kanade.presentation.reader.DisplayRefreshHost
@@ -97,6 +98,8 @@ import eu.kanade.tachiyomi.ui.reader.viewer.LocalPageColorFilter
 import eu.kanade.tachiyomi.ui.reader.viewer.Viewer
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.Action
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
+import eu.kanade.tachiyomi.ui.reader.viewer.webgpu.WebGpuFallback
+import eu.kanade.tachiyomi.ui.reader.viewer.webgpu.WebGpuViewer
 import eu.kanade.tachiyomi.ui.webview.WebViewActivity
 import eu.kanade.tachiyomi.util.system.openInBrowser
 import eu.kanade.tachiyomi.util.system.readerBackgroundColor
@@ -104,6 +107,7 @@ import eu.kanade.tachiyomi.util.system.toShareIntent
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.setComposeContent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -188,6 +192,8 @@ class ReaderActivity : BaseActivity() {
         windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         super.onCreate(savedInstanceState)
+
+        watchWebGpuDevice()
 
         setComposeContent {
             val state by viewModel.state.collectAsState()
@@ -629,6 +635,34 @@ class ReaderActivity : BaseActivity() {
     /**
      * Called from the presenter when a manga is ready. Used to instantiate the appropriate viewer.
      */
+    private fun onWebGpuDeviceLost() {
+        if (WebGpuFallback.isActive) return
+        WebGpuFallback.activate()
+        if (isFinishing || isDestroyed) return
+        updateViewer()
+        // updateViewer() only swaps the viewer; the loaded chapters must be handed to it again.
+        viewModel.state.value.viewerChapters?.let(::setChapters)
+        toast(MR.strings.webgpu_fallback_toast)
+    }
+
+    /**
+     * The WebGPU device can die mid-session (surface lost) and the library cannot rebuild it,
+     * leaving every page blank. Watch its availability and hand the session to the standard viewer.
+     */
+    private fun watchWebGpuDevice() {
+        lifecycleScope.launch {
+            while (true) {
+                delay(2000)
+                if (WebGpuFallback.isActive) return@launch
+                if (viewer is WebGpuViewer && !WebGpuRenderer.Companion.isAvailable) {
+                    logcat(LogPriority.WARN) { "WebGPU unavailable: ${WebGpuRenderer.Companion.unavailableReason}" }
+                    onWebGpuDeviceLost()
+                    return@launch
+                }
+            }
+        }
+    }
+
     private fun updateViewer() {
         val prevViewer = viewer
         val readingMode = viewModel.getMangaReadingMode()

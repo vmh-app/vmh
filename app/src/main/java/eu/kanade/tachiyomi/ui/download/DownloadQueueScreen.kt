@@ -46,6 +46,7 @@ import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.Pill
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.screens.EmptyArt
 import tachiyomi.presentation.core.screens.EmptyScreen
 
 object DownloadQueueScreen : Screen() {
@@ -223,6 +224,7 @@ object DownloadQueueScreen : Screen() {
                 EmptyScreen(
                     stringRes = MR.strings.information_no_downloads,
                     modifier = Modifier.padding(contentPadding),
+                    art = EmptyArt.BOX,
                 )
                 return@Scaffold
             }

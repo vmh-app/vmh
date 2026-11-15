@@ -78,6 +78,7 @@ private fun DialogContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
+                maxItemsInEachRow = 2,
             ) {
                 ReadingModesWithoutDefault.forEach { mode ->
                     VmhReaderModeButton(
@@ -101,21 +102,23 @@ private fun VmhReaderModeButton(
     title: String,
     modifier: Modifier = Modifier,
 ) {
+    // Mismo chip del dialogo de ajustes: acento al 14 % cuando esta elegido. Con la superficie
+    // de marca (blanca en tema claro) el chip activo se confundia con la hoja.
     val palette = rememberVmhLectorPalette()
     val containerColor = if (checked) {
-        palette.superficie
+        palette.acento.copy(alpha = 0.14f)
     } else {
         Color.Transparent
     }
     val contentColor = if (checked) {
-        palette.texto
+        palette.acento
     } else {
-        MaterialTheme.colorScheme.onSurface
+        MaterialTheme.colorScheme.onSurfaceVariant
     }
     val border = if (checked) {
-        BorderStroke(1.dp, palette.superficie)
+        BorderStroke(1.5.dp, palette.acento)
     } else {
-        BorderStroke(1.dp, palette.acento)
+        BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     }
 
     Surface(

@@ -29,7 +29,7 @@ internal fun ColumnScope.ReadingModePage(viewModel: ReaderSettingsViewModel) {
         return
     }
 
-    VmhSeccionTitulo(MR.strings.pref_category_for_this_series)
+    // Sin encabezado "Para esta serie": quedaba solo, pegado al de "Modo de lectura".
     val manga by viewModel.mangaFlow.collectAsState()
     val readingMode = remember(manga) { ReadingMode.fromPreference(manga?.readingMode?.toInt()) }
     VmhChipRow(MR.strings.pref_category_reading_mode) {

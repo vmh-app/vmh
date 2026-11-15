@@ -71,6 +71,7 @@ private fun DialogContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
+                maxItemsInEachRow = 2,
             ) {
                 ReaderOrientationsWithoutDefault.forEach { mode ->
                     VmhIconToggleButton(

@@ -3,6 +3,7 @@ package eu.kanade.presentation.reader.settings
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
@@ -78,11 +79,12 @@ fun VmhTabbedDialog(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .horizontalScroll(rememberScrollState()),
                 ) {
                     tabTitles.fastForEachIndexed { index, tab ->
                         VmhTab(
-                            modifier = Modifier.weight(1f),
                             title = tab,
                             selected = pagerState.currentPage == index,
                             accent = palette.acento,
@@ -137,16 +139,13 @@ private fun VmhTab(
         )
         Text(
             text = title.uppercase(),
-            modifier = Modifier
-                .padding(start = 6.dp)
-                .weight(1f),
+            modifier = Modifier.padding(start = 6.dp, end = 4.dp),
             style = MaterialTheme.typography.labelMedium.copy(
                 color = colorTexto,
                 fontWeight = FontWeight.SemiBold,
                 letterSpacing = 0.8.sp,
             ),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
     }
 }

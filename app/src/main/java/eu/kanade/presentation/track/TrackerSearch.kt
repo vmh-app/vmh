@@ -81,6 +81,7 @@ import tachiyomi.presentation.core.components.ScrollbarLazyColumn
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.screens.EmptyArt
 import tachiyomi.presentation.core.screens.EmptyScreen
 import tachiyomi.presentation.core.screens.LoadingScreen
 import tachiyomi.presentation.core.util.plus
@@ -207,6 +208,7 @@ fun TrackerSearch(
                     EmptyScreen(
                         modifier = Modifier.padding(innerPadding),
                         stringRes = MR.strings.no_results_found,
+                        art = EmptyArt.SEARCH,
                     )
                 } else {
                     ScrollbarLazyColumn(
@@ -230,6 +232,7 @@ fun TrackerSearch(
                     modifier = Modifier.padding(innerPadding),
                     message = queryResult.exceptionOrNull()?.message
                         ?: stringResource(MR.strings.unknown_error),
+                    art = EmptyArt.SAD,
                 )
             }
         }

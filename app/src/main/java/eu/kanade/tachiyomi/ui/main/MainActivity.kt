@@ -311,7 +311,6 @@ class MainActivity : BaseActivity() {
                 if (!isBenchmarkBuildType) {
                     if (isLaunch) CheckForUpdates()
                     ShowOnboarding()
-                    ShowDonationCampaign()
                 }
             }
         }
@@ -603,7 +602,7 @@ class MainActivity : BaseActivity() {
                 navigator.popUntilRoot()
                 HomeScreen.Tab.Library(idToOpen)
             }
-            Constants.SHORTCUT_UPDATES -> HomeScreen.Tab.Updates
+            Constants.SHORTCUT_UPDATES -> HomeScreen.Tab.Home
             Constants.SHORTCUT_HISTORY -> HomeScreen.Tab.History
             Constants.SHORTCUT_SOURCES -> HomeScreen.Tab.Browse(false)
             Constants.SHORTCUT_EXTENSIONS -> HomeScreen.Tab.Browse(true)
@@ -676,9 +675,9 @@ class MainActivity : BaseActivity() {
 }
 
 // Splash screen
-private const val SPLASH_MIN_DURATION = 500 // ms
-private const val SPLASH_MAX_DURATION = 5000 // ms
-private const val SPLASH_EXIT_ANIM_DURATION = 400L // ms
+private const val SPLASH_MIN_DURATION = 300 // ms
+private const val SPLASH_MAX_DURATION = 1500 // ms
+private const val SPLASH_EXIT_ANIM_DURATION = 150L // ms
 
 private val MIGRATING_SCREEN_MIN_DURATION = 1.seconds
 private val APP_UPDATE_CHECK_INTERVAL = 6.hours

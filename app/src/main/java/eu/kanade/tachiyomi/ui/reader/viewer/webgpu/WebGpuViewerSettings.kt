@@ -3,17 +3,21 @@ package eu.kanade.tachiyomi.ui.reader.viewer.webgpu
 import android.content.ActivityNotFoundException
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,11 +34,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
 import eu.kanade.domain.manga.model.readerOrientation
 import eu.kanade.domain.manga.model.readingMode
 import eu.kanade.presentation.reader.settings.TapZonesItems
+import eu.kanade.presentation.reader.settings.VmhChip
+import eu.kanade.presentation.reader.settings.VmhChipRow
+import eu.kanade.presentation.reader.settings.VmhSeccionGrupo
+import eu.kanade.presentation.reader.settings.VmhSeccionTitulo
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderOrientation
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsViewModel
@@ -50,9 +60,6 @@ import sh.calvin.reorderable.ReorderableColumn
 import tachiyomi.core.common.preference.Preference
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
-import eu.kanade.presentation.reader.settings.VmhChip
-import eu.kanade.presentation.reader.settings.VmhChipRow
-import eu.kanade.presentation.reader.settings.VmhSeccionTitulo
 import tachiyomi.presentation.core.components.CheckboxItem
 import tachiyomi.presentation.core.components.SettingsItemsPaddings
 import tachiyomi.presentation.core.components.SliderItem
@@ -63,7 +70,7 @@ import java.text.NumberFormat
 
 @Composable
 internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
-    VmhSeccionTitulo(MR.strings.pref_category_for_this_series)
+    // Sin encabezado "Para esta serie": quedaba solo, pegado al de "Modo de lectura".
     val manga by viewModel.mangaFlow.collectAsState()
 
     val readingMode = remember(manga) { ReadingMode.fromPreference(manga?.readingMode?.toInt()) }
@@ -136,7 +143,7 @@ internal fun WebGpuViewerSettings(viewModel: ReaderSettingsViewModel) {
         }
     }
 
-    VmhSeccionTitulo(MR.strings.webgpu_viewer)
+    VmhSeccionGrupo(MR.strings.webgpu_viewer)
 
     // As the viewer decides it, with the activity's window in place of the viewer's size. Not the sheet's own window.
     val configuration = LocalConfiguration.current
@@ -347,7 +354,7 @@ private fun ShaderList(labelRes: StringResource, pref: Preference<List<WebGpuSha
             }
         }
     }
-    TextButton(
+    Surface(
         onClick = {
             try {
                 pickShader.launch(arrayOf("*/*"))
@@ -355,12 +362,29 @@ private fun ShaderList(labelRes: StringResource, pref: Preference<List<WebGpuSha
                 error = e.message ?: e.toString()
             }
         },
-        modifier = Modifier.padding(horizontal = SettingsItemsPaddings.Horizontal - MaterialTheme.padding.small),
+        modifier = Modifier.padding(
+            start = SettingsItemsPaddings.Horizontal,
+            top = MaterialTheme.padding.small,
+        ),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+        contentColor = MaterialTheme.colorScheme.primary,
     ) {
-        Icon(imageVector = CustomMaterialSymbols.Rounded.Add, contentDescription = null)
-        Text(
-            text = stringResource(MR.strings.action_add_shader),
-            modifier = Modifier.padding(start = MaterialTheme.padding.small),
-        )
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(
+                imageVector = CustomMaterialSymbols.Rounded.Add,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+            )
+            Text(
+                text = stringResource(MR.strings.action_add_shader),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
     }
 }
