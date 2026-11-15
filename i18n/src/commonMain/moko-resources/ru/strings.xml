@@ -1063,4 +1063,15 @@
     <string name="home_in_library">В вашей библиотеке</string>
     <string name="home_update_new">Новое</string>
     <string name="home_empty">Пока ничего нового. Добавьте тайтлы в библиотеку, и они появятся здесь.</string>
+    <string name="vmh_guide_title">Начало работы</string>
+    <string name="vmh_guide_intro">Всё нужное умещается в четырёх шагах. Без аккаунта и без других настроек.</string>
+    <string name="vmh_guide_step1_title">Откройте Расширения</string>
+    <string name="vmh_guide_step1_desc">В нижней панели перейдите в Источники и выберите вкладку Расширения. Магазин VMH уже загружен.</string>
+    <string name="vmh_guide_step2_title">Установите свои источники</string>
+    <string name="vmh_guide_step2_desc">Выберите сайт, который читаете, и нажмите Установить. Каждое расширение добавляет один или несколько сайтов.</string>
+    <string name="vmh_guide_step3_title">Найдите свою серию</string>
+    <string name="vmh_guide_step3_desc">Нажмите значок поиска в нижней панели, выберите источник и введите название. Жанры можно просмотреть и на главной.</string>
+    <string name="vmh_guide_step4_title">Сохраните в библиотеку</string>
+    <string name="vmh_guide_step4_desc">Откройте серию и нажмите Добавить в библиотеку. Там вы следите за прогрессом и получаете новые главы.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

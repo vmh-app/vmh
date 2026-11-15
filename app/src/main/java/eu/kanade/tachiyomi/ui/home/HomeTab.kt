@@ -16,6 +16,7 @@ import dev.zacsweers.metrox.viewmodel.metroViewModel
 import eu.kanade.presentation.home.HomeScreen
 import eu.kanade.presentation.util.Tab
 import eu.kanade.tachiyomi.R
+import eu.kanade.tachiyomi.ui.browse.BrowseTab
 import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceScreen
 import eu.kanade.tachiyomi.ui.manga.MangaScreen
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
@@ -78,6 +79,7 @@ data object HomeTab : Tab {
                 hero.sourceId?.let { navigator.push(BrowseSourceScreen(it, null, genre)) }
             },
             onSampleMangaClick = { navigator.push(MangaScreen(it, fromSource = true)) },
+            onBrowseClick = { navigator.push(BrowseTab) },
         )
     }
 }

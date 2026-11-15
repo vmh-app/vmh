@@ -88,6 +88,8 @@ import tachiyomi.domain.source.model.Source
 import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.FastScrollLazyColumn
+import tachiyomi.presentation.core.components.VmhLabel
+import tachiyomi.presentation.core.components.vmhChipFill
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.screens.LoadingScreen
 
@@ -408,12 +410,8 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
 
             Spacer(Modifier.height(12.dp))
 
-            Text(
-                text = stringResource(MR.strings.label_migration).uppercase(),
-                style = MaterialTheme.typography.labelSmall.copy(
-                    letterSpacing = 2.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
+            VmhLabel(
+                text = stringResource(MR.strings.label_migration),
                 color = colors.primary,
             )
             Text(
@@ -471,19 +469,15 @@ class MigrationConfigScreen(private val mangaIds: Collection<Long>) : Screen() {
                 .padding(start = 16.dp, end = 14.dp, top = 16.dp, bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = stringResource(labelRes).uppercase(),
-                style = MaterialTheme.typography.labelSmall.copy(
-                    letterSpacing = 2.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
+            VmhLabel(
+                text = stringResource(labelRes),
                 color = colors.onSurfaceVariant,
             )
             Spacer(Modifier.width(8.dp))
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(9.dp))
-                    .background(colors.primary.copy(alpha = 0.12f))
+                    .background(vmhChipFill(true))
                     .padding(horizontal = 6.dp, vertical = 2.dp),
             ) {
                 Text(

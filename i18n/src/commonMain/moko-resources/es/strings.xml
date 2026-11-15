@@ -1075,4 +1075,5 @@
     <string name="update_check_skip_message">Las actualizaciones suelen incluir correcciones de errores y mejoras de seguridad. No se te volverá a recordar esta versión, pero sí se te avisará cuando salga una más nueva.</string>
     <string name="update_check_skip_title">¿Saltar %s?</string>
     <string name="ext_filtered">Filtradas</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

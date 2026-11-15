@@ -44,7 +44,9 @@ import mihon.icons.materialsymbols.rounded.Schedule
 import mihon.icons.materialsymbols.roundedfilled.Bookmark
 import tachiyomi.domain.updates.model.UpdatesWithRelations
 import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.components.VmhLabel
 import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
+import tachiyomi.presentation.core.components.vmhChipFill
 import tachiyomi.presentation.core.i18n.stringResource
 
 internal fun LazyListScope.updatesLastUpdatedItem(
@@ -102,12 +104,8 @@ private fun UpdatesDayHeader(text: String) {
             .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = text.uppercase(),
-            style = MaterialTheme.typography.labelSmall.copy(
-                letterSpacing = 2.sp,
-                fontWeight = FontWeight.Bold,
-            ),
+        VmhLabel(
+            text = text,
             color = colors.primary,
         )
         Spacer(Modifier.width(10.dp))
@@ -210,7 +208,7 @@ private fun UpdatesUiItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),
         shape = RoundedCornerShape(17.dp),
-        color = if (selected) colors.primary.copy(alpha = 0.12f) else colors.surface,
+        color = vmhChipFill(selected, colors.surface),
         border = BorderStroke(1.dp, if (selected) colors.primary else colors.outlineVariant),
         shadowElevation = if (selected) 0.dp else 2.dp,
     ) {

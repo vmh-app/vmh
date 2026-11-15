@@ -1063,4 +1063,15 @@
     <string name="home_in_library">Nasa iyong aklatan</string>
     <string name="home_update_new">Bago</string>
     <string name="home_empty">Wala pang bago. Magdagdag ng serye sa iyong aklatan at lalabas ito rito.</string>
+    <string name="vmh_guide_title">Pagsisimula</string>
+    <string name="vmh_guide_intro">Lahat ng kailangan mo ay kasya sa apat na hakbang. Walang account, wala nang iba pang ise-set up.</string>
+    <string name="vmh_guide_step1_title">Buksan ang Extensions</string>
+    <string name="vmh_guide_step1_desc">Sa ibabang bar, pumasok sa Mga Source at piliin ang tab na Extensions. Nakapasok na ang VMH store.</string>
+    <string name="vmh_guide_step2_title">I-install ang iyong mga source</string>
+    <string name="vmh_guide_step2_desc">Piliin ang site na binabasa mo at i-tap ang I-install. Nagdadagdag ang bawat source ng isa o higit pang site.</string>
+    <string name="vmh_guide_step3_title">Hanapin ang iyong serye</string>
+    <string name="vmh_guide_step3_desc">I-tap ang search icon sa ibabang bar, pumili ng source at i-type ang pamagat. Makakapag-browse ka rin ng genre mula sa Home.</string>
+    <string name="vmh_guide_step4_title">Itago ito sa iyong Aklatan</string>
+    <string name="vmh_guide_step4_desc">Buksan ang serye at i-tap ang Idagdag sa Aklatan. Doon mo masusubaybayan ang progreso at makakakuha ng mga bagong kabanata.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

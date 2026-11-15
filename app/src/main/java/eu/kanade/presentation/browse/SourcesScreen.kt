@@ -54,6 +54,7 @@ import tachiyomi.domain.source.model.Pin
 import tachiyomi.domain.source.model.Source
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.ScrollbarLazyColumn
+import tachiyomi.presentation.core.components.VmhLabel
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.screens.EmptyArt
 import tachiyomi.presentation.core.screens.EmptyScreen
@@ -171,12 +172,8 @@ private fun SourceSectionHeader(section: SourceSection) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Text(
-            text = title.uppercase(),
-            style = MaterialTheme.typography.labelSmall.copy(
-                letterSpacing = 2.sp,
-                fontWeight = FontWeight.Bold,
-            ),
+        VmhLabel(
+            text = title,
             color = colors.onSurfaceVariant,
         )
         if (section.sources.isNotEmpty()) {

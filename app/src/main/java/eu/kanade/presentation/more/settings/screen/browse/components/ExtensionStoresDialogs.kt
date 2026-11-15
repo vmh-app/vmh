@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -20,6 +18,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import eu.kanade.presentation.components.VmhAlertDialog
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
 
@@ -41,55 +40,42 @@ fun ExtensionStoreCreateDialog(
 
     val focusRequester = remember { FocusRequester() }
 
-    AlertDialog(
+    VmhAlertDialog(
+        title = stringResource(MR.strings.extensionStoresScreen_addStore_title),
         onDismissRequest = onDismissRequest,
-        title = {
-            Text(text = stringResource(MR.strings.extensionStoresScreen_addStore_title))
-        },
-        text = {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                state = state,
-                label = {
-                    Text(text = stringResource(MR.strings.extensionStoresScreen_addStoreInput_inputLabel))
-                },
-                supportingText = {
-                    val msgRes = if (storeAlreadyExists) {
-                        MR.strings.extensionStoresScreen_addStore_alreadyExists
-                    } else {
-                        MR.strings.information_required_plain
-                    }
-                    Text(text = errorMessage ?: stringResource(msgRes))
-                },
-                isError = errorMessage != null || storeAlreadyExists,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                lineLimits = TextFieldLineLimits.SingleLine,
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onCreate(state.text.toString()) },
-                enabled = !processing && state.text.isNotEmpty() && !storeAlreadyExists,
-            ) {
-                Text(
-                    text = stringResource(
-                        resource = if (processing) {
-                            MR.strings.extensionStoresScreen_addStore_processing
-                        } else {
-                            MR.strings.action_add
-                        },
-                    ),
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = stringResource(MR.strings.action_cancel))
-            }
-        },
-    )
+        confirmLabel = stringResource(
+            resource = if (processing) {
+                MR.strings.extensionStoresScreen_addStore_processing
+            } else {
+                MR.strings.action_add
+            },
+        ),
+        onConfirm = { onCreate(state.text.toString()) },
+        dismissLabel = stringResource(MR.strings.action_cancel),
+        destructive = false,
+        confirmEnabled = !processing && state.text.isNotEmpty() && !storeAlreadyExists,
+    ) {
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            state = state,
+            label = {
+                Text(text = stringResource(MR.strings.extensionStoresScreen_addStoreInput_inputLabel))
+            },
+            supportingText = {
+                val msgRes = if (storeAlreadyExists) {
+                    MR.strings.extensionStoresScreen_addStore_alreadyExists
+                } else {
+                    MR.strings.information_required_plain
+                }
+                Text(text = errorMessage ?: stringResource(msgRes))
+            },
+            isError = errorMessage != null || storeAlreadyExists,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            lineLimits = TextFieldLineLimits.SingleLine,
+        )
+    }
 
     LaunchedEffect(focusRequester) {
         focusRequester.requestFocus()
@@ -103,28 +89,19 @@ fun ExtensionStoreDeleteDialog(
     storeName: String,
     storeIndexUrl: String,
 ) {
-    AlertDialog(
+    VmhAlertDialog(
+        title = stringResource(MR.strings.extensionStoresScreen_deleteStore_title),
         onDismissRequest = onDismissRequest,
-        title = {
-            Text(text = stringResource(MR.strings.extensionStoresScreen_deleteStore_title))
+        confirmLabel = stringResource(MR.strings.action_ok),
+        onConfirm = {
+            onDelete()
+            onDismissRequest()
         },
-        text = {
-            Text(text = stringResource(MR.strings.extensionStoresScreen_deleteStore_body, storeName, storeIndexUrl))
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                onDelete()
-                onDismissRequest()
-            }) {
-                Text(text = stringResource(MR.strings.action_ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = stringResource(MR.strings.action_cancel))
-            }
-        },
-    )
+        dismissLabel = stringResource(MR.strings.action_cancel),
+        destructive = true,
+    ) {
+        Text(text = stringResource(MR.strings.extensionStoresScreen_deleteStore_body, storeName, storeIndexUrl))
+    }
 }
 
 @Composable
@@ -137,52 +114,42 @@ fun ExtensionStoreConfirmDialog(
     errorMessage: String?,
 ) {
     val state = rememberTextFieldState(initialText = storeIndexUrl)
-    AlertDialog(
+    VmhAlertDialog(
+        title = stringResource(MR.strings.extensionStoresScreen_addStore_title),
         onDismissRequest = onDismissRequest,
-        title = {
-            Text(text = stringResource(MR.strings.extensionStoresScreen_addStore_title))
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = stringResource(MR.strings.extensionStoresScreen_addStoreDeeplink_bodyText))
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    state = state,
-                    readOnly = true,
-                    supportingText = when {
-                        storeAlreadyExists -> {
-                            {
-                                Text(text = stringResource(MR.strings.extensionStoresScreen_addStore_alreadyExists))
-                            }
+        confirmLabel = stringResource(
+            resource = if (processing) {
+                MR.strings.extensionStoresScreen_addStore_processing
+            } else {
+                MR.strings.action_add
+            },
+        ),
+        onConfirm = onCreate,
+        dismissLabel = stringResource(MR.strings.action_cancel),
+        destructive = false,
+        confirmEnabled = !storeAlreadyExists && !processing,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(text = stringResource(MR.strings.extensionStoresScreen_addStoreDeeplink_bodyText))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                state = state,
+                readOnly = true,
+                supportingText = when {
+                    storeAlreadyExists -> {
+                        {
+                            Text(text = stringResource(MR.strings.extensionStoresScreen_addStore_alreadyExists))
                         }
-                        errorMessage != null -> {
-                            {
-                                Text(text = errorMessage)
-                            }
+                    }
+                    errorMessage != null -> {
+                        {
+                            Text(text = errorMessage)
                         }
-                        else -> null
-                    },
-                    isError = errorMessage != null || storeAlreadyExists,
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onCreate, enabled = !storeAlreadyExists && !processing) {
-                Text(
-                    text = stringResource(
-                        resource = if (processing) {
-                            MR.strings.extensionStoresScreen_addStore_processing
-                        } else {
-                            MR.strings.action_add
-                        },
-                    ),
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = stringResource(MR.strings.action_cancel))
-            }
-        },
-    )
+                    }
+                    else -> null
+                },
+                isError = errorMessage != null || storeAlreadyExists,
+            )
+        }
+    }
 }

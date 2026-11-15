@@ -36,6 +36,8 @@ import kotlinx.coroutines.launch
 import mihon.icons.materialsymbols.MaterialSymbols
 import mihon.icons.materialsymbols.rounded.MoreVert
 import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.components.vmhChipBorder
+import tachiyomi.presentation.core.components.vmhChipFill
 import tachiyomi.presentation.core.i18n.stringResource
 
 object TabbedDialogPaddings {
@@ -105,11 +107,11 @@ private fun VmhTabPill(
         onClick = onClick,
         modifier = Modifier.height(34.dp),
         shape = RoundedCornerShape(17.dp),
-        color = if (selected) colors.primary.copy(alpha = 0.12f) else colors.surface,
+        color = vmhChipFill(selected, colors.surface),
         contentColor = if (selected) colors.primary else colors.onSurfaceVariant,
         border = BorderStroke(
             1.dp,
-            if (selected) colors.primary.copy(alpha = 0.5f) else colors.outlineVariant,
+            vmhChipBorder(selected),
         ),
     ) {
         Box(

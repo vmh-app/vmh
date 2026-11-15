@@ -161,7 +161,6 @@ class HomeViewModel(
                     mangaId = manga.id,
                     title = manga.title,
                     coverData = manga.asMangaCover(),
-                    subtitle = heroSubtitle(manga, source.name),
                 )
             }
             .toList()
@@ -203,7 +202,6 @@ class HomeViewModel(
                         mangaId = manga.id,
                         title = manga.title,
                         coverData = manga.asMangaCover(),
-                        subtitle = heroSubtitle(manga, source.name),
                     )
                 },
             )
@@ -272,15 +270,6 @@ class HomeViewModel(
         return names.distinct().take(SOURCE_GENRE_COUNT)
     }
 
-    private fun heroSubtitle(manga: Manga, sourceName: String): String {
-        return manga.genre.orEmpty()
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .take(2)
-            .joinToString(" · ")
-            .ifBlank { sourceName }
-    }
-
     private fun hasAdultGenre(manga: Manga): Boolean {
         return manga.genre.orEmpty().any { genre -> ADULT_GENRES.any { it.equals(genre.trim(), ignoreCase = true) } }
     }
@@ -309,7 +298,6 @@ data class HomeHeroItem(
     val mangaId: Long,
     val title: String,
     val coverData: MangaCover,
-    val subtitle: String,
 )
 
 data class HomeHeroState(

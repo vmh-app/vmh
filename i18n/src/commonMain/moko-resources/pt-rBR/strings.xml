@@ -1063,4 +1063,15 @@
     <string name="pref_redact_sensitive_headers_summary">Oculta certos valores sensíveis nos logs. Mantenha ativado para sua segurança ao compartilhar logs.</string>
     <string name="app_name">VMH</string>
     <string name="webgpu_fallback_toast">O acelerador gráfico falhou. Alterado para o visualizador padrão.</string>
+    <string name="vmh_guide_title">Primeiros passos</string>
+    <string name="vmh_guide_intro">Tudo o que você precisa cabe em quatro passos. Sem conta e sem mais nada para configurar.</string>
+    <string name="vmh_guide_step1_title">Abra as Extensões</string>
+    <string name="vmh_guide_step1_desc">Na barra de baixo entre em Fontes e escolha a aba Extensões. A loja da VMH já vem carregada.</string>
+    <string name="vmh_guide_step2_title">Instale as suas fontes</string>
+    <string name="vmh_guide_step2_desc">Escolha o site que você lê e toque em Instalar. Cada fonte adiciona um ou mais sites.</string>
+    <string name="vmh_guide_step3_title">Encontre a sua série</string>
+    <string name="vmh_guide_step3_desc">Toque no ícone de busca da barra de baixo, escolha uma fonte e digite o título. Você também pode explorar por gênero em Início.</string>
+    <string name="vmh_guide_step4_title">Mantenha na sua biblioteca</string>
+    <string name="vmh_guide_step4_desc">Abra a série e toque em Adicionar à biblioteca. De lá você acompanha o progresso e recebe os capítulos novos.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.components.VmhSectionTitle
 import tachiyomi.presentation.core.components.material.VmhSliderThumb
 import tachiyomi.presentation.core.components.material.VmhSliderTrack
 
@@ -63,13 +64,9 @@ internal data class MultiListDialogData<T>(
 
 @Composable
 internal fun VmhSectionHeader(title: String) {
-    Text(
-        text = title.uppercase(),
+    VmhSectionTitle(
+        text = title,
         modifier = Modifier.padding(start = 32.dp, top = 16.dp, bottom = 4.dp),
-        style = MaterialTheme.typography.labelMedium,
-        fontWeight = FontWeight.SemiBold,
-        letterSpacing = 1.6.sp,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
     )
 }
 

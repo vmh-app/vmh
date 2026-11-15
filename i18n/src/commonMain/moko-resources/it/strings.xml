@@ -1063,4 +1063,15 @@
     <string name="donationCampaign.paragraph3">In ogni caso, VMH continuerà a essere mantenuto da me e dai volontari, e resterà open source.</string>
     <string name="donationCampaign.contactPlatform">Discord</string>
     <string name="donationCampaign.dismiss">Chiudi</string>
+    <string name="vmh_guide_title">Per iniziare</string>
+    <string name="vmh_guide_intro">Tutto ciò che ti serve sta in quattro passaggi. Nessun account, nient\'altro da configurare.</string>
+    <string name="vmh_guide_step1_title">Apri Estensioni</string>
+    <string name="vmh_guide_step1_desc">Nella barra in basso apri Fonti e scegli la scheda Estensioni. Lo store di VMH è già caricato.</string>
+    <string name="vmh_guide_step2_title">Installa le tue fonti</string>
+    <string name="vmh_guide_step2_desc">Scegli il sito che leggi e tocca Installa. Ogni fonte aggiunge uno o più siti.</string>
+    <string name="vmh_guide_step3_title">Trova la tua serie</string>
+    <string name="vmh_guide_step3_desc">Tocca l\'icona di ricerca nella barra in basso, scegli una fonte e digita il titolo. Puoi anche sfogliare i generi da Home.</string>
+    <string name="vmh_guide_step4_title">Tienila nella tua libreria</string>
+    <string name="vmh_guide_step4_desc">Apri la serie e tocca Aggiungi alla libreria. Da lì segui i tuoi progressi e ricevi i nuovi capitoli.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

@@ -52,6 +52,7 @@ import tachiyomi.core.common.preference.TriState
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
+import tachiyomi.presentation.core.components.vmhChipFill
 import tachiyomi.presentation.core.i18n.stringResource
 
 @Composable
@@ -324,7 +325,7 @@ private fun VmhSortRow(
             modifier = Modifier
                 .size(30.dp)
                 .clip(CircleShape)
-                .background(if (selected) colors.primary.copy(alpha = 0.12f) else Color.Transparent),
+                .background(vmhChipFill(selected)),
             contentAlignment = Alignment.Center,
         ) {
             if (selected) {

@@ -76,6 +76,22 @@ fun LibraryContent(
             )
         }
 
+        val summaryCategory = categories.getOrNull(pagerState.currentPage)
+        val summaryItems = summaryCategory?.let(getItemsForCategory).orEmpty()
+        if (summaryItems.isNotEmpty() && selection.isEmpty() && searchQuery.isNullOrEmpty()) {
+            val resumeTarget = summaryItems.firstOrNull { it.unreadCount > 0 }?.libraryManga
+            LibrarySummaryBand(
+                seriesCount = summaryItems.size,
+                unreadCount = summaryItems.sumOf { it.unreadCount },
+                onResume = if (resumeTarget != null && onContinueReadingClicked != null) {
+                    { onContinueReadingClicked.invoke(resumeTarget) }
+                } else {
+                    null
+                },
+                onRefresh = { scope.launch { onRefresh() } },
+            )
+        }
+
         PullRefresh(
             refreshing = isRefreshing,
             enabled = selection.isEmpty(),

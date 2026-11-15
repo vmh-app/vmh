@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,7 +57,9 @@ import mihon.icons.materialsymbols.rounded.Search
 import tachiyomi.domain.history.model.HistoryWithRelations
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.FastScrollLazyColumn
+import tachiyomi.presentation.core.components.VmhLabel
 import tachiyomi.presentation.core.components.VmhScreenHeader
+import tachiyomi.presentation.core.components.VmhSnackbarHost
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.screens.EmptyArt
@@ -84,7 +85,7 @@ fun HistoryScreen(
                 onClearHistory = { onDialogChange(HistoryViewModel.Dialog.DeleteAll) },
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = { VmhSnackbarHost(hostState = snackbarHostState) },
     ) { contentPadding ->
         state.list.let {
             if (it == null) {
@@ -216,12 +217,8 @@ private fun VmhHistoryDayHeader(text: String) {
             .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = text.uppercase(),
-            style = MaterialTheme.typography.labelSmall.copy(
-                letterSpacing = 2.sp,
-                fontWeight = FontWeight.Bold,
-            ),
+        VmhLabel(
+            text = text,
             color = colors.primary,
         )
         Spacer(Modifier.width(10.dp))

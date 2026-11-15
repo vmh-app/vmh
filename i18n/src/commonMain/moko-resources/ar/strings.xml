@@ -1063,4 +1063,15 @@
     <string name="home_in_library">في مكتبتك</string>
     <string name="home_update_new">جديد</string>
     <string name="home_empty">لا جديد بعد. أضف أعمالًا إلى مكتبتك وستظهر هنا.</string>
+    <string name="vmh_guide_title">البدء</string>
+    <string name="vmh_guide_intro">كل ما تحتاجه موجود في أربع خطوات. بدون حساب ولا شيء آخر يجب إعداده.</string>
+    <string name="vmh_guide_step1_title">افتح الإضافات</string>
+    <string name="vmh_guide_step1_desc">من الشريط السفلي ادخل إلى المصادر واختر تبويب الإضافات. متجر VMH محمّل مسبقًا.</string>
+    <string name="vmh_guide_step2_title">ثبّت مصادرك</string>
+    <string name="vmh_guide_step2_desc">اختر الموقع الذي تقرأ منه واضغط تثبيت. كل إضافة تضيف موقعًا واحدًا أو أكثر.</string>
+    <string name="vmh_guide_step3_title">ابحث عن سلسلتك</string>
+    <string name="vmh_guide_step3_desc">اضغط أيقونة البحث في الشريط السفلي، اختر مصدرًا واكتب العنوان. يمكنك أيضًا التصفح حسب النوع من الرئيسية.</string>
+    <string name="vmh_guide_step4_title">احفظها في مكتبتك</string>
+    <string name="vmh_guide_step4_desc">افتح السلسلة واضغط إضافة إلى المكتبة. من هناك تتابع تقدمك وتصلك الفصول الجديدة.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

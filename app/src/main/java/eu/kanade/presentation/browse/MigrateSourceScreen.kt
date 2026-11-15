@@ -51,6 +51,7 @@ import mihon.icons.materialsymbols.rounded.Check
 import tachiyomi.domain.source.model.Source
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.FastScrollLazyColumn
+import tachiyomi.presentation.core.components.VmhLabel
 import tachiyomi.presentation.core.components.material.topSmallPaddingValues
 import tachiyomi.presentation.core.i18n.pluralStringResource
 import tachiyomi.presentation.core.i18n.stringResource
@@ -310,13 +311,9 @@ private fun RowScope.VmhStepConnector(reached: Boolean) {
 
 @Composable
 private fun VmhSectionLabel(text: String) {
-    Text(
-        text = text.uppercase(),
+    VmhLabel(
+        text = text,
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 6.dp),
-        style = MaterialTheme.typography.labelSmall.copy(
-            letterSpacing = 2.sp,
-            fontWeight = FontWeight.Bold,
-        ),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }

@@ -31,11 +31,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SuggestionChip
-import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,13 +50,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import eu.kanade.presentation.library.components.MangaCompactGridItem
-import eu.kanade.presentation.library.components.MangaListItem
 import eu.kanade.presentation.util.relativeTimeSpanString
 import eu.kanade.tachiyomi.ui.home.HomeGenreSample
 import eu.kanade.tachiyomi.ui.home.HomeHeroItem
@@ -68,15 +63,23 @@ import eu.kanade.tachiyomi.ui.home.HomeHistoryItem
 import kotlinx.coroutines.delay
 import mihon.icons.materialsymbols.MaterialSymbols
 import mihon.icons.materialsymbols.automirroredrounded.ArrowForward
+import mihon.icons.materialsymbols.rounded.Explore
+import mihon.icons.materialsymbols.roundedfilled.PlayArrow
 import tachiyomi.domain.updates.model.UpdatesWithRelations
 import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.components.VmhCard
+import tachiyomi.presentation.core.components.VmhCountPill
 import tachiyomi.presentation.core.components.VmhCoverShape
+import tachiyomi.presentation.core.components.VmhEyebrow
+import tachiyomi.presentation.core.components.VmhMetaPill
 import tachiyomi.presentation.core.components.VmhPillShape
 import tachiyomi.presentation.core.components.VmhScreenHeader
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.screens.EmptyArt
-import tachiyomi.presentation.core.screens.EmptyMascot
+import tachiyomi.presentation.core.screens.EmptyScreen
+import tachiyomi.presentation.core.screens.EmptyScreenAction
+import kotlin.math.roundToInt
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
@@ -92,6 +95,7 @@ fun HomeScreen(
     onViewAllUpdates: () -> Unit,
     onSourceGenreClick: (String) -> Unit,
     onSampleMangaClick: (Long) -> Unit,
+    onBrowseClick: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
@@ -115,20 +119,19 @@ fun HomeScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 32.dp),
-                contentAlignment = Alignment.Center,
+                    .padding(paddingValues),
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    EmptyMascot(art = EmptyArt.SLEEP, modifier = Modifier.fillMaxWidth())
-                    Text(
-                        text = stringResource(MR.strings.home_empty),
-                        modifier = Modifier.padding(top = 18.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    )
-                }
+                EmptyScreen(
+                    message = stringResource(MR.strings.home_empty),
+                    art = EmptyArt.SLEEP,
+                    actions = listOf(
+                        EmptyScreenAction(
+                            stringRes = MR.strings.browse,
+                            icon = MaterialSymbols.Rounded.Explore,
+                            onClick = onBrowseClick,
+                        ),
+                    ),
+                )
             }
         } else {
             Column(
@@ -143,19 +146,19 @@ fun HomeScreen(
                     HeroBanner(state = hero, onMangaClick = onMangaClick)
                 }
 
-                if (updates.isNotEmpty()) {
-                    UpdatesSection(
-                        updates = updates,
-                        onViewAllClick = onViewAllUpdates,
-                        onMangaClick = onMangaClick,
-                    )
-                }
-
                 if (history.isNotEmpty()) {
                     HistorySection(
                         history = history,
                         onMangaClick = onMangaClick,
                         onContinue = onHistoryContinue,
+                    )
+                }
+
+                if (updates.isNotEmpty()) {
+                    UpdatesSection(
+                        updates = updates,
+                        onViewAllClick = onViewAllUpdates,
+                        onMangaClick = onMangaClick,
                     )
                 }
 
@@ -387,18 +390,6 @@ private fun HeroCard(
                         overflow = TextOverflow.Ellipsis,
                     )
 
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = item.subtitle,
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            shadow = Shadow(hero.fondoAbajo, Offset(0f, 1f), 6f),
-                        ),
-                        color = hero.textoSuave,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-
                     Spacer(modifier = Modifier.weight(1f))
 
                     Row(
@@ -467,7 +458,12 @@ private fun HeroCard(
 }
 
 @Composable
-private fun SectionHeader(title: String, action: (@Composable () -> Unit)? = null) {
+private fun SectionHeader(
+    title: String,
+    count: Int? = null,
+    onAction: (() -> Unit)? = null,
+) {
+    val colors = MaterialTheme.colorScheme
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -475,13 +471,40 @@ private fun SectionHeader(title: String, action: (@Composable () -> Unit)? = nul
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = title.uppercase(),
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-        )
-        action?.invoke()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            VmhEyebrow(text = title)
+            if (count != null && count > 0) {
+                Spacer(Modifier.width(8.dp))
+                VmhCountPill(text = count.toString())
+            }
+        }
+        if (onAction != null) {
+            Surface(
+                onClick = onAction,
+                shape = VmhPillShape,
+                color = Color.Transparent,
+                border = BorderStroke(1.dp, colors.outlineVariant),
+            ) {
+                Row(
+                    modifier = Modifier.padding(start = 12.dp, end = 8.dp, top = 5.dp, bottom = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(MR.strings.home_view_all),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = colors.primary,
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Icon(
+                        imageVector = MaterialSymbols.AutoMirroredRounded.ArrowForward,
+                        contentDescription = null,
+                        tint = colors.primary,
+                        modifier = Modifier.size(14.dp),
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -494,11 +517,8 @@ private fun UpdatesSection(
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SectionHeader(
             title = stringResource(MR.strings.home_latest_updates),
-            action = {
-                TextButton(onClick = onViewAllClick) {
-                    Text(stringResource(MR.strings.home_view_all))
-                }
-            },
+            count = updates.size,
+            onAction = onViewAllClick,
         )
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp),
@@ -566,28 +586,109 @@ private fun HistorySection(
         SectionHeader(title = stringResource(MR.strings.home_recently_read))
         Column(
             modifier = Modifier.padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             history.forEach { item ->
+                HistoryCard(
+                    item = item,
+                    onClick = { onMangaClick(item.history.mangaId) },
+                    onContinue = { onContinue(item.history.mangaId, item.history.chapterId) },
+                )
+            }
+        }
+    }
+}
+
+/** Tarjeta de "sigue leyendo": portada, capítulo, avance y boton de continuar. */
+@Composable
+private fun HistoryCard(
+    item: HomeHistoryItem,
+    onClick: () -> Unit,
+    onContinue: () -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    val progress = item.progress
+    VmhCard(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onClick)
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AsyncImage(
+                    model = item.history.coverData,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(56.dp)
+                        .height(84.dp)
+                        .clip(VmhCoverShape)
+                        .background(colors.surfaceVariant),
+                )
+                Spacer(Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = item.history.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = colors.onSurface,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        VmhMetaPill(text = chapterNumberText(item.history.chapterNumber))
+                        if (progress != null) {
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "${(progress * 100).roundToInt()} %",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = colors.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.width(8.dp))
+                Surface(
+                    onClick = onContinue,
+                    shape = CircleShape,
+                    color = colors.primary,
+                    contentColor = colors.onPrimary,
+                    modifier = Modifier.size(40.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = MaterialSymbols.RoundedFilled.PlayArrow,
+                            contentDescription = stringResource(MR.strings.action_resume),
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+                }
+            }
+            if (progress != null && progress > 0f) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(MaterialTheme.shapes.medium)
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                        .height(3.dp)
+                        .background(colors.outlineVariant.copy(alpha = 0.4f)),
                 ) {
-                    MangaListItem(
-                        coverData = item.history.coverData,
-                        title = item.history.title,
-                        onClick = { onMangaClick(item.history.mangaId) },
-                        onLongClick = { },
-                        badge = { },
-                        progress = item.progress,
-                        onClickContinueReading = { onContinue(item.history.mangaId, item.history.chapterId) },
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progress.coerceIn(0f, 1f))
+                            .fillMaxHeight()
+                            .background(colors.primary),
                     )
                 }
             }
         }
     }
+}
+
+private fun chapterNumberText(value: Double): String {
+    val text = if (value % 1.0 == 0.0) value.toInt().toString() else "%.1f".format(value)
+    return "#$text"
 }
 
 @Composable
@@ -616,16 +717,25 @@ private fun GenresSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(sourceGenres, key = { it }) { genre ->
-                    SuggestionChip(
+                    Surface(
                         onClick = { onGenreClick(genre) },
-                        label = { Text(genre) },
-                        colors = SuggestionChipDefaults.suggestionChipColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = VmhPillShape,
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        border = BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f),
                         ),
-                        border = null,
-                        shape = RoundedCornerShape(16.dp),
-                    )
+                    ) {
+                        Text(
+                            text = genre,
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
             }
         } else {

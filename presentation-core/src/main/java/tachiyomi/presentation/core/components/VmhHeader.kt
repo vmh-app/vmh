@@ -204,6 +204,48 @@ fun VmhSectionTitle(
 }
 
 /**
+ * Etiqueta de encabezado de lista o de bloque: mayúsculas con el espaciado de VMH.
+ *
+ * Es la firma tipográfica de los encabezados de día, sección y antetítulo de pantalla.
+ */
+@Composable
+fun VmhLabel(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary,
+) {
+    Text(
+        text = text.uppercase(),
+        modifier = modifier,
+        style = MaterialTheme.typography.labelSmall.copy(
+            letterSpacing = 2.sp,
+            fontWeight = FontWeight.Bold,
+        ),
+        color = color,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
+}
+
+/**
+ * Relleno de una pastilla seleccionable: tinte del acento al 12 %.
+ */
+@Composable
+fun vmhChipFill(
+    selected: Boolean,
+    unselected: Color = Color.Transparent,
+): Color = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else unselected
+
+/**
+ * Borde de una pastilla seleccionable: acento al 50 % cuando está activa.
+ */
+@Composable
+fun vmhChipBorder(
+    selected: Boolean,
+    unselected: Color = MaterialTheme.colorScheme.outlineVariant,
+): Color = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else unselected
+
+/**
  * Tarjeta de contenido de VMH: superficie del tema, borde tenue y radio grande.
  */
 @Composable

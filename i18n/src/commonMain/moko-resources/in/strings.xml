@@ -1063,4 +1063,15 @@
     <string name="home_in_library">Di pustakamu</string>
     <string name="home_update_new">Baru</string>
     <string name="home_empty">Belum ada yang baru. Tambahkan judul ke pustakamu dan akan muncul di sini.</string>
+    <string name="vmh_guide_title">Memulai</string>
+    <string name="vmh_guide_intro">Semua yang kamu butuhkan ada dalam empat langkah. Tanpa akun, tanpa pengaturan lain.</string>
+    <string name="vmh_guide_step1_title">Buka Ekstensi</string>
+    <string name="vmh_guide_step1_desc">Di bilah bawah masuk ke Sumber dan pilih tab Ekstensi. Toko VMH sudah dimuat.</string>
+    <string name="vmh_guide_step2_title">Pasang sumbermu</string>
+    <string name="vmh_guide_step2_desc">Pilih situs yang kamu baca dan ketuk Pasang. Setiap ekstensi menambahkan satu atau beberapa situs.</string>
+    <string name="vmh_guide_step3_title">Temukan serialmu</string>
+    <string name="vmh_guide_step3_desc">Ketuk ikon pencarian di bilah bawah, pilih sumber, lalu ketik judulnya. Kamu juga bisa menjelajah genre dari Beranda.</string>
+    <string name="vmh_guide_step4_title">Simpan di Pustakamu</string>
+    <string name="vmh_guide_step4_desc">Buka serial dan ketuk Tambahkan ke Pustaka. Dari sana kamu mengikuti progres dan menerima bab baru.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

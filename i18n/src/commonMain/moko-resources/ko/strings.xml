@@ -1063,4 +1063,15 @@
     <string name="home_in_library">내 라이브러리</string>
     <string name="home_update_new">신규</string>
     <string name="home_empty">아직 새 소식이 없습니다. 작품을 라이브러리에 추가하면 여기에 표시됩니다.</string>
+    <string name="vmh_guide_title">시작하기</string>
+    <string name="vmh_guide_intro">필요한 모든 것이 네 단계에 담겨 있습니다. 계정도, 다른 설정도 필요 없습니다.</string>
+    <string name="vmh_guide_step1_title">확장 앱 열기</string>
+    <string name="vmh_guide_step1_desc">하단 바에서 소스를 열고 확장 앱 탭을 선택하세요. VMH 스토어는 이미 불러와져 있습니다.</string>
+    <string name="vmh_guide_step2_title">소스 설치하기</string>
+    <string name="vmh_guide_step2_desc">읽는 사이트를 고르고 설치를 누르세요. 각 소스는 하나 이상의 사이트를 추가합니다.</string>
+    <string name="vmh_guide_step3_title">작품 찾기</string>
+    <string name="vmh_guide_step3_desc">하단 바의 검색 아이콘을 눌러 소스를 고르고 제목을 입력하세요. 홈에서 장르로 둘러볼 수도 있습니다.</string>
+    <string name="vmh_guide_step4_title">서재에 담아두기</string>
+    <string name="vmh_guide_step4_desc">작품을 열고 서재에 추가를 누르세요. 거기서 진행 상황을 따라가고 새 화를 받습니다.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

@@ -1063,4 +1063,15 @@
     <string name="home_in_library">在你的书库中</string>
     <string name="home_update_new">新</string>
     <string name="home_empty">还没有新内容。把作品加入书库后就会显示在这里。</string>
+    <string name="vmh_guide_title">开始使用</string>
+    <string name="vmh_guide_intro">你需要的都在四个步骤里。无需账号，也没有其他设置。</string>
+    <string name="vmh_guide_step1_title">打开扩展</string>
+    <string name="vmh_guide_step1_desc">在底部栏进入图源并选择扩展标签页。VMH 商店已经加载好了。</string>
+    <string name="vmh_guide_step2_title">安装你的图源</string>
+    <string name="vmh_guide_step2_desc">选择你阅读的网站并点击安装。每个扩展会添加一个或多个网站。</string>
+    <string name="vmh_guide_step3_title">找到你的作品</string>
+    <string name="vmh_guide_step3_desc">点击底部栏的搜索图标，选择一个图源并输入标题。你也可以从首页按类型浏览。</string>
+    <string name="vmh_guide_step4_title">保存在书架中</string>
+    <string name="vmh_guide_step4_desc">打开作品并点击添加到书架。之后就能跟踪进度并收到新章节。</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

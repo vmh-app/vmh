@@ -40,6 +40,7 @@ import mihon.icons.materialsymbols.roundedfilled.Circle
 import tachiyomi.domain.library.service.LibraryPreferences
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
+import tachiyomi.presentation.core.components.vmhChipFill
 import tachiyomi.presentation.core.i18n.stringResource
 
 @Composable
@@ -92,7 +93,7 @@ fun MangaChapterListItem(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp),
             shape = RoundedCornerShape(17.dp),
-            color = if (selected) colors.primary.copy(alpha = 0.12f) else colors.surface,
+            color = vmhChipFill(selected, colors.surface),
             border = BorderStroke(1.dp, if (selected) colors.primary else colors.outlineVariant),
             shadowElevation = if (selected) 0.dp else 2.dp,
         ) {
@@ -178,7 +179,7 @@ private fun ChapterStateBadge(
     Surface(
         modifier = Modifier.size(34.dp),
         shape = RoundedCornerShape(12.dp),
-        color = if (read && !bookmark) colors.surfaceContainerHigh else colors.primary.copy(alpha = 0.12f),
+        color = if (read && !bookmark) colors.surfaceContainerHigh else vmhChipFill(true),
         contentColor = if (read && !bookmark) colors.onSurfaceVariant else colors.primary,
     ) {
         Box(contentAlignment = Alignment.Center) {

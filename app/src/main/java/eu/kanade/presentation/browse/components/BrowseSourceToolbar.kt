@@ -49,6 +49,7 @@ import mihon.icons.materialsymbols.roundedfilled.ViewCompact
 import mihon.icons.materialsymbols.roundedfilled.ViewModule
 import tachiyomi.domain.library.model.LibraryDisplayMode
 import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.components.VmhLabel
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.source.local.LocalSource
 
@@ -122,12 +123,8 @@ fun BrowseSourceToolbar(
             } else {
                 Column(modifier = Modifier.weight(1f)) {
                     if (language != null) {
-                        Text(
-                            text = language.uppercase(),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                letterSpacing = 2.sp,
-                                fontWeight = FontWeight.Bold,
-                            ),
+                        VmhLabel(
+                            text = language,
                             color = colors.primary,
                         )
                     }

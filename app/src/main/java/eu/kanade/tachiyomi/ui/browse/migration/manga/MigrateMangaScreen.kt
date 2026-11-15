@@ -58,6 +58,7 @@ import mihon.icons.materialsymbols.rounded.Check
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.FastScrollLazyColumn
+import tachiyomi.presentation.core.components.VmhLabel
 import tachiyomi.presentation.core.i18n.pluralStringResource
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.screens.EmptyScreen
@@ -194,12 +195,8 @@ private fun VmhReviewHeader(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            Text(
-                text = stringResource(MR.strings.label_migration).uppercase(),
-                style = MaterialTheme.typography.labelSmall.copy(
-                    letterSpacing = 2.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
+            VmhLabel(
+                text = stringResource(MR.strings.label_migration),
                 color = colors.primary,
             )
             Text(
@@ -232,12 +229,8 @@ private fun VmhReviewSectionHeader(count: Int) {
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = stringResource(MR.strings.vmh_migration_titles).uppercase(),
-            style = MaterialTheme.typography.labelSmall.copy(
-                letterSpacing = 2.sp,
-                fontWeight = FontWeight.Bold,
-            ),
+        VmhLabel(
+            text = stringResource(MR.strings.vmh_migration_titles),
             color = colors.onSurfaceVariant,
         )
         Spacer(Modifier.width(8.dp))

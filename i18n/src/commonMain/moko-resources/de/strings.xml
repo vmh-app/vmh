@@ -1063,4 +1063,15 @@
     <string name="information_webview_crashed">WebView funktioniert nicht mehr und die Seite wurde geschlossen</string>
     <string name="app_name">VMH</string>
     <string name="webgpu_fallback_toast">Der Grafikbeschleuniger ist ausgefallen. Zum Standardbetrachter gewechselt.</string>
+    <string name="vmh_guide_title">Erste Schritte</string>
+    <string name="vmh_guide_intro">Alles Nötige passt in vier Schritte. Kein Konto, nichts weiter einzurichten.</string>
+    <string name="vmh_guide_step1_title">Erweiterungen öffnen</string>
+    <string name="vmh_guide_step1_desc">Öffne in der unteren Leiste Quellen und wähle den Tab Erweiterungen. Der VMH-Store ist bereits geladen.</string>
+    <string name="vmh_guide_step2_title">Quellen installieren</string>
+    <string name="vmh_guide_step2_desc">Wähle die Seite, die du liest, und tippe auf Installieren. Jede Quelle fügt eine oder mehrere Seiten hinzu.</string>
+    <string name="vmh_guide_step3_title">Serie finden</string>
+    <string name="vmh_guide_step3_desc">Tippe unten auf das Suchsymbol, wähle eine Quelle und gib den Titel ein. Du kannst auch von Start aus nach Genre stöbern.</string>
+    <string name="vmh_guide_step4_title">In der Bibliothek behalten</string>
+    <string name="vmh_guide_step4_desc">Öffne die Serie und tippe auf Zur Bibliothek hinzufügen. Dort verfolgst du deinen Fortschritt und bekommst neue Kapitel.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

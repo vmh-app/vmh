@@ -1063,4 +1063,15 @@
     <string name="home_in_library">ライブラリ内</string>
     <string name="home_update_new">新着</string>
     <string name="home_empty">まだ新しい項目はありません。作品をライブラリに追加するとここに表示されます。</string>
+    <string name="vmh_guide_title">はじめに</string>
+    <string name="vmh_guide_intro">必要なものは4つのステップにまとまっています。アカウントも、ほかの設定もいりません。</string>
+    <string name="vmh_guide_step1_title">拡張機能を開く</string>
+    <string name="vmh_guide_step1_desc">下のバーでソースを開き、拡張機能タブを選びます。VMHストアはすでに読み込まれています。</string>
+    <string name="vmh_guide_step2_title">ソースをインストール</string>
+    <string name="vmh_guide_step2_desc">読んでいるサイトを選び、「インストール」をタップします。各ソースが1つ以上のサイトを追加します。</string>
+    <string name="vmh_guide_step3_title">作品を探す</string>
+    <string name="vmh_guide_step3_desc">下のバーの検索アイコンをタップし、ソースを選んでタイトルを入力します。ホームからジャンルで探すこともできます。</string>
+    <string name="vmh_guide_step4_title">ライブラリに保存</string>
+    <string name="vmh_guide_step4_desc">作品を開いて「ライブラリに追加」をタップします。そこから進捗を追い、新しい章を受け取れます。</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

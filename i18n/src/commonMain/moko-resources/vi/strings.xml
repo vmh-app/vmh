@@ -1063,4 +1063,15 @@
     <string name="home_in_library">Trong thư viện của bạn</string>
     <string name="home_update_new">Mới</string>
     <string name="home_empty">Chưa có gì mới. Thêm bộ truyện vào thư viện và chúng sẽ hiện ở đây.</string>
+    <string name="vmh_guide_title">Bắt đầu</string>
+    <string name="vmh_guide_intro">Mọi thứ bạn cần nằm trong bốn bước. Không cần tài khoản, không phải thiết lập gì thêm.</string>
+    <string name="vmh_guide_step1_title">Mở Tiện ích</string>
+    <string name="vmh_guide_step1_desc">Trên thanh dưới, vào Nguồn và chọn thẻ Tiện ích. Cửa hàng VMH đã được tải sẵn.</string>
+    <string name="vmh_guide_step2_title">Cài đặt nguồn của bạn</string>
+    <string name="vmh_guide_step2_desc">Chọn trang bạn đọc và nhấn Cài đặt. Mỗi tiện ích thêm một hoặc nhiều trang.</string>
+    <string name="vmh_guide_step3_title">Tìm bộ truyện của bạn</string>
+    <string name="vmh_guide_step3_desc">Nhấn biểu tượng tìm kiếm trên thanh dưới, chọn nguồn và gõ tên truyện. Bạn cũng có thể duyệt theo thể loại từ Trang chủ.</string>
+    <string name="vmh_guide_step4_title">Giữ trong thư viện của bạn</string>
+    <string name="vmh_guide_step4_desc">Mở bộ truyện và nhấn Thêm vào thư viện. Từ đó bạn theo dõi tiến độ và nhận chương mới.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

@@ -1063,4 +1063,15 @@
     <string name="information_webview_crashed">WebView a cessé de fonctionner et la page a été fermée.</string>
     <string name="app_name">VMH</string>
     <string name="webgpu_fallback_toast">L'accélérateur graphique a échoué. Lecteur standard activé.</string>
+    <string name="vmh_guide_title">Premiers pas</string>
+    <string name="vmh_guide_intro">Tout ce qu\'il te faut tient en quatre étapes. Sans compte et sans rien d\'autre à configurer.</string>
+    <string name="vmh_guide_step1_title">Ouvre Extensions</string>
+    <string name="vmh_guide_step1_desc">Dans la barre du bas, ouvre Sources et choisis l\'onglet Extensions. Le magasin VMH est déjà chargé.</string>
+    <string name="vmh_guide_step2_title">Installe tes sources</string>
+    <string name="vmh_guide_step2_desc">Choisis le site que tu lis et appuie sur Installer. Chaque source ajoute un ou plusieurs sites.</string>
+    <string name="vmh_guide_step3_title">Trouve ta série</string>
+    <string name="vmh_guide_step3_desc">Appuie sur l\'icône de recherche de la barre du bas, choisis une source et saisis le titre. Tu peux aussi parcourir les genres depuis Accueil.</string>
+    <string name="vmh_guide_step4_title">Garde-la dans ta bibliothèque</string>
+    <string name="vmh_guide_step4_desc">Ouvre la série et appuie sur Ajouter à la bibliothèque. De là, tu suis ta progression et reçois les nouveaux chapitres.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

@@ -1063,4 +1063,15 @@
     <string name="home_in_library">Kitaplığınızda</string>
     <string name="home_update_new">Yeni</string>
     <string name="home_empty">Henüz yeni bir şey yok. Kitaplığınıza eser eklediğinizde burada görünür.</string>
+    <string name="vmh_guide_title">Başlarken</string>
+    <string name="vmh_guide_intro">İhtiyacın olan her şey dört adıma sığar. Hesap yok, başka bir ayar da yok.</string>
+    <string name="vmh_guide_step1_title">Uzantıları aç</string>
+    <string name="vmh_guide_step1_desc">Alt çubuktan Kaynaklar'a gir ve Uzantılar sekmesini seç. VMH mağazası zaten yüklü.</string>
+    <string name="vmh_guide_step2_title">Kaynaklarını yükle</string>
+    <string name="vmh_guide_step2_desc">Okuduğun siteyi seç ve Yükle'ye dokun. Her uzantı bir veya daha fazla site ekler.</string>
+    <string name="vmh_guide_step3_title">Serini bul</string>
+    <string name="vmh_guide_step3_desc">Alt çubuktaki arama simgesine dokun, bir kaynak seç ve başlığı yaz. Ana Sayfa'dan türlere de göz atabilirsin.</string>
+    <string name="vmh_guide_step4_title">Kitaplığında sakla</string>
+    <string name="vmh_guide_step4_desc">Seriyi aç ve Kitaplığa ekle'ye dokun. Oradan ilerlemeni takip eder ve yeni bölümleri alırsın.</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

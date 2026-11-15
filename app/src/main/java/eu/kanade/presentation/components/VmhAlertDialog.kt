@@ -35,6 +35,7 @@ fun VmhAlertDialog(
     onConfirm: () -> Unit,
     dismissLabel: String,
     destructive: Boolean,
+    confirmEnabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
@@ -73,9 +74,15 @@ fun VmhAlertDialog(
                     Spacer(Modifier.width(6.dp))
                     Surface(
                         onClick = onConfirm,
+                        enabled = confirmEnabled,
                         modifier = Modifier.height(34.dp),
                         shape = RoundedCornerShape(17.dp),
-                        color = if (destructive) colors.error else colors.primary,
+                        color = when {
+                            !confirmEnabled && destructive -> colors.error.copy(alpha = 0.45f)
+                            !confirmEnabled -> colors.primary.copy(alpha = 0.45f)
+                            destructive -> colors.error
+                            else -> colors.primary
+                        },
                         contentColor = if (destructive) colors.onError else colors.onPrimary,
                     ) {
                         Box(

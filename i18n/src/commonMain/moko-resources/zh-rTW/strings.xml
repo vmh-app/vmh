@@ -1063,4 +1063,15 @@
     <string name="home_in_library">在你的書櫃中</string>
     <string name="home_update_new">新</string>
     <string name="home_empty">還沒有新內容。把作品加入書櫃後就會顯示在這裡。</string>
+    <string name="vmh_guide_title">開始使用</string>
+    <string name="vmh_guide_intro">你需要的都在四個步驟裡。免帳號，也沒有其他設定。</string>
+    <string name="vmh_guide_step1_title">開啟擴充套件</string>
+    <string name="vmh_guide_step1_desc">在底部列進入來源並選擇擴充套件分頁。VMH 商店已經載入好了。</string>
+    <string name="vmh_guide_step2_title">安裝你的來源</string>
+    <string name="vmh_guide_step2_desc">選擇你閱讀的網站並點擊安裝。每個擴充套件會新增一個或多個網站。</string>
+    <string name="vmh_guide_step3_title">找到你的作品</string>
+    <string name="vmh_guide_step3_desc">點擊底部列的搜尋圖示，選擇一個來源並輸入標題。你也可以從首頁依類型瀏覽。</string>
+    <string name="vmh_guide_step4_title">保存在書櫃中</string>
+    <string name="vmh_guide_step4_desc">開啟作品並點擊加入書櫃。之後就能追蹤進度並收到新章節。</string>
+    <string name="vmh_about_github">GitHub</string>
 </resources>

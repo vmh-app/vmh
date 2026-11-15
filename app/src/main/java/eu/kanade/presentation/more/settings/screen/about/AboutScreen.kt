@@ -167,7 +167,8 @@ object AboutScreen : Screen() {
                 item {
                     VmhSettingsCardColumn {
                         VmhTextPreference(
-                            title = stringResource(MR.strings.website),
+                            title = stringResource(MR.strings.vmh_about_github),
+                            subtitle = "github.com/vmh-app/vmh",
                             onClick = {
                                 uriHandler.openUri("https://github.com/vmh-app/vmh")
                             },

@@ -55,6 +55,8 @@ import mihon.icons.materialsymbols.rounded.Close
 import mihon.icons.materialsymbols.rounded.FilterList
 import mihon.icons.materialsymbols.rounded.Search
 import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.components.vmhChipBorder
+import tachiyomi.presentation.core.components.vmhChipFill
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.runOnEnterKeyPressed
 
@@ -190,11 +192,11 @@ fun VmhFilterPill(
         onClick = onClick,
         modifier = modifier.height(30.dp),
         shape = RoundedCornerShape(15.dp),
-        color = if (selected) colors.primary.copy(alpha = 0.12f) else colors.surface,
+        color = vmhChipFill(selected, colors.surface),
         contentColor = if (selected) colors.primary else colors.onSurfaceVariant,
         border = BorderStroke(
             1.dp,
-            if (selected) colors.primary.copy(alpha = 0.5f) else colors.outlineVariant,
+            vmhChipBorder(selected),
         ),
     ) {
         Row(
@@ -308,11 +310,11 @@ fun VmhCircleAction(
         enabled = enabled,
         modifier = modifier.size(40.dp),
         shape = CircleShape,
-        color = if (activo) colors.primary.copy(alpha = 0.12f) else colors.surface,
+        color = vmhChipFill(activo, colors.surface),
         contentColor = if (activo) colors.primary else colors.onSurfaceVariant,
         border = BorderStroke(
             1.dp,
-            if (activo) colors.primary.copy(alpha = 0.5f) else colors.outlineVariant,
+            vmhChipBorder(activo),
         ),
         shadowElevation = 2.dp,
     ) {
