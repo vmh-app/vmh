@@ -115,4 +115,12 @@
         <item quantity="many">%1$d atualizações falharam</item>
         <item quantity="other">%1$d atualizações falharam</item>
     </plurals>
+    <plurals name="home_badge_library_updates">
+        <item quantity="one">%1$d mangá com novos capítulos</item>
+        <item quantity="other">%1$d mangás com novos capítulos</item>
+    </plurals>
+    <plurals name="vmh_migration_titles_in_library">
+        <item quantity="one">%1$d título na sua biblioteca</item>
+        <item quantity="other">%1$d títulos na sua biblioteca</item>
+    </plurals>
 </resources>

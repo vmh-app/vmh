@@ -92,4 +92,12 @@
         <item quantity="one">%1$d Aktualisierung ist fehlgeschlagen</item>
         <item quantity="other">%1$d Aktualisierungen sind fehlgeschlagen</item>
     </plurals>
+    <plurals name="home_badge_library_updates">
+        <item quantity="one">%1$d Manga mit neuen Kapiteln</item>
+        <item quantity="other">%1$d Mangas mit neuen Kapiteln</item>
+    </plurals>
+    <plurals name="vmh_migration_titles_in_library">
+        <item quantity="one">%1$d Titel in deiner Bibliothek</item>
+        <item quantity="other">%1$d Titel in deiner Bibliothek</item>
+    </plurals>
 </resources>
