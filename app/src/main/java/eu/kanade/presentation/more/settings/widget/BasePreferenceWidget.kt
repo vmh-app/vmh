@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,13 +54,14 @@ internal fun BasePreferenceWidget(
             .highlightBackground(highlighted)
             .sizeIn(minHeight = minHeight)
             .clickable(enabled = enabled && onClick != null, onClick = { onClick?.invoke() })
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(vertical = 4.dp), // Separación adicional
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
             Box(
                 modifier = Modifier
-                    .padding(start = PrefsHorizontalPadding, end = 8.dp)
+                    .padding(start = PrefsHorizontalPadding, end = 12.dp)
                     .alpha(contentAlpha),
                 content = { icon() },
             )
@@ -67,16 +69,19 @@ internal fun BasePreferenceWidget(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(vertical = PrefsVerticalPadding)
+                .padding(vertical = 8.dp)
                 .alpha(contentAlpha),
         ) {
             if (!title.isNullOrBlank()) {
                 Text(
-                    modifier = Modifier.padding(horizontal = PrefsHorizontalPadding),
+                    modifier = Modifier
+                        .padding(horizontal = PrefsHorizontalPadding)
+                        .padding(bottom = 2.dp),
                     text = title,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
                     fontSize = TitleFontSize,
                 )
             }

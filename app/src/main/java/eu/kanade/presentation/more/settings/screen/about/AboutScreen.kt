@@ -2,7 +2,6 @@ package eu.kanade.presentation.more.settings.screen.about
 
 import android.content.Context
 import android.text.format.DateFormat
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,7 +24,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import eu.kanade.domain.ui.UiPreferences
 import eu.kanade.presentation.components.AppBar
 import eu.kanade.presentation.more.LogoHeader
-import eu.kanade.presentation.more.settings.widget.TextPreferenceWidget
+import eu.kanade.presentation.more.settings.screen.VmhSettingsCardColumn
+import eu.kanade.presentation.more.settings.screen.VmhTextPreference
 import eu.kanade.presentation.util.LocalBackPress
 import eu.kanade.presentation.util.Screen
 import eu.kanade.presentation.util.rememberIs24HourSystem
@@ -93,121 +93,84 @@ object AboutScreen : Screen() {
             ) {
                 item {
                     LogoHeader(
-                        iconPadding = PaddingValues(vertical = 56.dp),
+                        iconPadding = PaddingValues(vertical = 48.dp),
                     )
                 }
 
                 item {
-                    TextPreferenceWidget(
-                        title = stringResource(MR.strings.version),
-                        // Keyed on the system 12/24h setting, which can change while the app is backgrounded.
-                        // Date/time prefs only change in Appearance, which recreates this screen on return.
-                        subtitle = remember(is24HourSystem) { getVersionName(withBuildDate = true) },
-                        onPreferenceClick = {
-                            val deviceInfo = crashLogUtil.getDebugInfo()
-                            context.copyToClipboard("Debug information", deviceInfo)
-                        },
-                    )
-                }
+                    VmhSettingsCardColumn {
+                        VmhTextPreference(
+                            title = stringResource(MR.strings.version),
+                            // Keyed on the system 12/24h setting, which can change while the app is backgrounded.
+                            // Date/time prefs only change in Appearance, which recreates this screen on return.
+                            subtitle = remember(is24HourSystem) { getVersionName(withBuildDate = true) },
+                            onClick = {
+                                val deviceInfo = crashLogUtil.getDebugInfo()
+                                context.copyToClipboard("Debug information", deviceInfo)
+                            },
+                        )
 
-                if (updaterEnabled) {
-                    item {
-                        TextPreferenceWidget(
-                            title = stringResource(MR.strings.check_for_updates),
-                            widget = {
-                                AnimatedVisibility(visible = isCheckingUpdates) {
+                        if (updaterEnabled) {
+                            val checkingIndicator: (@Composable () -> Unit)? = if (isCheckingUpdates) {
+                                {
                                     CircularProgressIndicator(
-                                        modifier = Modifier.size(28.dp),
-                                        strokeWidth = 3.dp,
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp,
                                     )
                                 }
-                            },
-                            onPreferenceClick = {
-                                if (!isCheckingUpdates) {
-                                    scope.launch {
-                                        isCheckingUpdates = true
+                            } else {
+                                null
+                            }
+                            VmhTextPreference(
+                                title = stringResource(MR.strings.check_for_updates),
+                                trailing = checkingIndicator,
+                                onClick = {
+                                    if (!isCheckingUpdates) {
+                                        scope.launch {
+                                            isCheckingUpdates = true
 
-                                        checkVersion(
-                                            context = context,
-                                            onAvailableUpdate = { result ->
-                                                val updateScreen = NewUpdateScreen(
-                                                    versionName = result.release.version,
-                                                    changelogInfo = result.release.info,
-                                                    releaseLink = result.release.releaseLink,
-                                                    downloadLink = result.release.downloadLink,
-                                                )
-                                                navigator.push(updateScreen)
-                                            },
-                                            onFinish = {
-                                                isCheckingUpdates = false
-                                            },
-                                        )
+                                            checkVersion(
+                                                context = context,
+                                                onAvailableUpdate = { result ->
+                                                    val updateScreen = NewUpdateScreen(
+                                                        versionName = result.release.version,
+                                                        changelogInfo = result.release.info,
+                                                        releaseLink = result.release.releaseLink,
+                                                        downloadLink = result.release.downloadLink,
+                                                    )
+                                                    navigator.push(updateScreen)
+                                                },
+                                                onFinish = {
+                                                    isCheckingUpdates = false
+                                                },
+                                            )
+                                        }
                                     }
-                                }
+                                },
+                            )
+                        }
+
+                        if (!BuildConfig.DEBUG) {
+                            VmhTextPreference(
+                                title = stringResource(MR.strings.whats_new),
+                                onClick = { uriHandler.openUri(RELEASE_URL) },
+                            )
+                        }
+
+                        VmhTextPreference(
+                            title = stringResource(MR.strings.licenses),
+                            onClick = { navigator.push(OpenSourceLicensesScreen()) },
+                        )
+                    }
+                }
+
+                item {
+                    VmhSettingsCardColumn {
+                        VmhTextPreference(
+                            title = stringResource(MR.strings.website),
+                            onClick = {
+                                uriHandler.openUri("https://vmh-extensions.gestevezmurillo.workers.dev")
                             },
-                        )
-                    }
-                }
-
-                if (!BuildConfig.DEBUG) {
-                    item {
-                        TextPreferenceWidget(
-                            title = stringResource(MR.strings.whats_new),
-                            onPreferenceClick = { uriHandler.openUri(RELEASE_URL) },
-                        )
-                    }
-                }
-
-                item {
-                    TextPreferenceWidget(
-                        title = stringResource(MR.strings.licenses),
-                        onPreferenceClick = { navigator.push(OpenSourceLicensesScreen()) },
-                    )
-                }
-
-                item {
-                    TextPreferenceWidget(
-                        title = stringResource(MR.strings.privacy_policy),
-                        onPreferenceClick = { uriHandler.openUri("https://mihon.app/privacy/") },
-                    )
-                }
-
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        LinkIcon(
-                            label = stringResource(MR.strings.website),
-                            icon = MaterialSymbols.Rounded.Public,
-                            url = "https://mihon.app",
-                        )
-                        LinkIcon(
-                            label = "Discord",
-                            icon = SimpleIcons.Discord,
-                            url = Constants.URL_DISCORD,
-                        )
-                        LinkIcon(
-                            label = "X",
-                            icon = SimpleIcons.X,
-                            url = "https://x.com/mihonapp",
-                        )
-                        LinkIcon(
-                            label = "Facebook",
-                            icon = SimpleIcons.Facebook,
-                            url = "https://facebook.com/mihonapp",
-                        )
-                        LinkIcon(
-                            label = "Reddit",
-                            icon = SimpleIcons.Reddit,
-                            url = "https://www.reddit.com/r/mihonapp",
-                        )
-                        LinkIcon(
-                            label = "GitHub",
-                            icon = SimpleIcons.Github,
-                            url = "https://github.com/mihonapp",
                         )
                     }
                 }

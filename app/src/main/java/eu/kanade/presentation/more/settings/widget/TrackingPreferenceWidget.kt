@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -46,7 +45,7 @@ fun TrackingPreferenceWidget(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = PrefsHorizontalPadding, vertical = 8.dp),
+                .padding(horizontal = 20.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
@@ -66,9 +65,9 @@ fun TrackingPreferenceWidget(
                         text = tracker.name,
                         modifier = Modifier.padding(horizontal = 16.dp),
                         maxLines = 1,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontSize = TitleFontSize,
-                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     val displayName = tracker.getDisplayUsername()
                     if (isLoggedIn && displayName.isNotBlank()) {
@@ -76,7 +75,8 @@ fun TrackingPreferenceWidget(
                             text = displayName,
                             modifier = Modifier.padding(horizontal = 16.dp),
                             maxLines = 1,
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
@@ -95,7 +95,8 @@ fun TrackingPreferenceWidget(
                                 imageVector = MaterialSymbols.Rounded.Refresh,
                                 modifier = Modifier
                                     .padding(4.dp)
-                                    .size(32.dp),
+                                    .size(24.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 contentDescription = stringResource(MR.strings.refresh_tracker_profile),
                             )
                         } else {
@@ -110,8 +111,8 @@ fun TrackingPreferenceWidget(
                     imageVector = MaterialSymbols.Rounded.Check,
                     modifier = Modifier
                         .padding(4.dp)
-                        .size(32.dp),
-                    tint = Color(0xFF4CAF50),
+                        .size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = stringResource(MR.strings.login_success),
                 )
             }

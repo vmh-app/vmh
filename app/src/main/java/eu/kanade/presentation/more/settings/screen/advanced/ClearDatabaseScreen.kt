@@ -63,6 +63,7 @@ import tachiyomi.presentation.core.components.LazyColumnWithAction
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.screens.EmptyArt
 import tachiyomi.presentation.core.screens.EmptyScreen
 import tachiyomi.presentation.core.screens.LoadingScreen
 import tachiyomi.presentation.core.util.selectedBackground
@@ -168,6 +169,7 @@ class ClearDatabaseScreen : Screen() {
                         EmptyScreen(
                             message = stringResource(MR.strings.database_clean),
                             modifier = Modifier.padding(contentPadding),
+                            art = EmptyArt.BOX,
                         )
                     } else {
                         LazyColumnWithAction(

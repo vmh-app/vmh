@@ -6,10 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import mihon.feature.support.SupportUsScreen
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
 
@@ -43,20 +42,11 @@ data object MoreTab : Tab {
 
     override val options: TabOptions
         @Composable
-        get() {
-            val isSelected = LocalTabNavigator.current.current.key == key
-            val enter = AnimatedImageVector.animatedVectorResource(R.drawable.animated_more_enter)
-            val exit = AnimatedImageVector.animatedVectorResource(R.drawable.animated_more_exit)
-            return TabOptions(
-                index = 4u,
-                title = stringResource(MR.strings.label_more),
-                icon = rememberAnimatedVectorPainter(enter, exit, isSelected),
-            )
-        }
-
-    override suspend fun onReselect(navigator: Navigator) {
-        navigator.push(SettingsScreen())
-    }
+        get() = TabOptions(
+            index = 4u,
+            title = stringResource(MR.strings.label_settings),
+            icon = painterResource(R.drawable.ic_vmh_nav_settings),
+        )
 
     @Composable
     override fun Content() {
@@ -74,7 +64,6 @@ data object MoreTab : Tab {
             onClickStats = { navigator.push(StatsScreen()) },
             onClickDataAndStorage = { navigator.push(SettingsScreen(SettingsScreen.Destination.DataAndStorage)) },
             onClickSettings = { navigator.push(SettingsScreen()) },
-            onClickSupport = { navigator.push(SupportUsScreen()) },
             onClickAbout = { navigator.push(SettingsScreen(SettingsScreen.Destination.About)) },
         )
     }

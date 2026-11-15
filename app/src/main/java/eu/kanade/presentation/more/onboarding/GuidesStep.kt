@@ -1,22 +1,32 @@
 package eu.kanade.presentation.more.onboarding
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import eu.kanade.presentation.theme.TachiyomiPreviewTheme
+import eu.kanade.tachiyomi.R
 import tachiyomi.i18n.MR
-import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
+
+const val GETTING_STARTED_URL = "https://vmh-extensions.gestevezmurillo.workers.dev"
 
 internal class GuidesStep(
     private val onRestoreBackup: () -> Unit,
@@ -26,44 +36,73 @@ internal class GuidesStep(
 
     @Composable
     override fun Content() {
-        val handler = LocalUriHandler.current
+        val colors = MaterialTheme.colorScheme
 
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
-        ) {
-            Text(stringResource(MR.strings.onboarding_guides_new_user, stringResource(MR.strings.app_name)))
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { handler.openUri(GETTING_STARTED_URL) },
+        Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+            // Tarjeta que detalla explícitamente lo que incluye la copia de seguridad.
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(colors.surfaceContainerHighest)
+                    .border(1.dp, colors.outlineVariant.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                    .padding(20.dp),
             ) {
-                Text(stringResource(MR.strings.getting_started_guide))
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        VmhIconTile(
+                            painter = painterResource(R.drawable.ic_vmh_restore),
+                            tint = colors.secondary,
+                        )
+                        Spacer(Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = stringResource(MR.strings.vmh_onb_guides_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.onSurface,
+                            )
+                            Text(
+                                text = stringResource(MR.strings.vmh_onb_guides_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = colors.onSurfaceVariant,
+                            )
+                        }
+                    }
+
+                    // Elementos a recuperar
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        RestoreItem(stringResource(MR.strings.vmh_onb_restore_library))
+                        RestoreItem(stringResource(MR.strings.vmh_onb_restore_history))
+                        RestoreItem(stringResource(MR.strings.vmh_onb_restore_settings))
+                    }
+                }
             }
 
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-
-            Text(stringResource(MR.strings.onboarding_guides_returning_user, stringResource(MR.strings.app_name)))
-            Button(
-                modifier = Modifier.fillMaxWidth(),
+            VmhStepAction(
+                text = stringResource(MR.strings.pref_restore_backup),
+                icon = painterResource(R.drawable.ic_vmh_restore),
                 onClick = onRestoreBackup,
-            ) {
-                Text(stringResource(MR.strings.pref_restore_backup))
-            }
+            )
         }
     }
-}
 
-const val GETTING_STARTED_URL = "https://mihon.app/docs/guides/getting-started"
-
-@PreviewLightDark
-@Composable
-private fun GuidesStepPreview() {
-    TachiyomiPreviewTheme {
-        GuidesStep(
-            onRestoreBackup = {},
-        ).Content()
+    @Composable
+    private fun RestoreItem(name: String) {
+        val colors = MaterialTheme.colorScheme
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(R.drawable.ic_vmh_book),
+                contentDescription = null,
+                tint = colors.secondary.copy(alpha = 0.8f),
+                modifier = Modifier.size(16.dp),
+            )
+            Spacer(Modifier.width(12.dp))
+            Text(
+                text = name,
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.onSurfaceVariant,
+            )
+        }
     }
 }

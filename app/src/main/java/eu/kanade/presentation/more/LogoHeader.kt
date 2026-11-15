@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -24,14 +23,12 @@ fun LogoHeader(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Icon(
-            painter = painterResource(R.drawable.ic_mihon),
+            painter = painterResource(R.drawable.ic_vmh_splash),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .padding(iconPadding)
                 .size(64.dp),
         )
-
-        HorizontalDivider()
     }
 }

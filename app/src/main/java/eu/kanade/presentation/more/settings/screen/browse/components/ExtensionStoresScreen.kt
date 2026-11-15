@@ -19,6 +19,7 @@ import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.components.material.topSmallPaddingValues
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.screens.EmptyArt
 import tachiyomi.presentation.core.screens.EmptyScreen
 import tachiyomi.presentation.core.util.plus
 
@@ -61,6 +62,7 @@ fun ExtensionStoresScreen(
             EmptyScreen(
                 MR.strings.extensionStoresScreen_emptyLabel,
                 modifier = Modifier.padding(paddingValues),
+                art = EmptyArt.SEARCH,
             )
             return@Scaffold
         }

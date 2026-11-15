@@ -2,8 +2,10 @@ package eu.kanade.presentation.more.settings.widget
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -32,6 +34,10 @@ fun SwitchPreferenceWidget(
                 checked = checked,
                 onCheckedChange = null,
                 enabled = enabled,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.tertiary,
+                    checkedTrackColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f),
+                ),
                 modifier = Modifier.padding(start = TrailingWidgetBuffer),
             )
         },

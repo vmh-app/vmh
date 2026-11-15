@@ -55,6 +55,7 @@ import mihon.icons.materialsymbols.rounded.Close
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.screens.EmptyArt
 import tachiyomi.presentation.core.screens.EmptyScreen
 import tachiyomi.presentation.core.util.runOnEnterKeyPressed
 import cafe.adriel.voyager.core.screen.Screen as VoyagerScreen
@@ -179,7 +180,10 @@ private fun SearchResult(
         when {
             it == null -> {}
             it.isEmpty() -> {
-                EmptyScreen(stringResource(MR.strings.no_results_found))
+                EmptyScreen(
+                    message = stringResource(MR.strings.no_results_found),
+                    art = EmptyArt.SEARCH,
+                )
             }
             else -> {
                 LazyColumn(

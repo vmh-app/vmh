@@ -1,10 +1,8 @@
 package eu.kanade.presentation.more.settings
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,7 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import eu.kanade.presentation.more.settings.screen.SearchableSettings
-import eu.kanade.presentation.more.settings.widget.PreferenceGroupHeader
+import eu.kanade.presentation.more.settings.screen.VmhSectionHeader
+import eu.kanade.presentation.more.settings.screen.VmhSettingsCardColumn
 import kotlinx.coroutines.delay
 import tachiyomi.presentation.core.components.ScrollbarLazyColumn
 import kotlin.time.Duration.Companion.seconds
@@ -52,23 +51,24 @@ fun PreferenceScreen(
                 is Preference.PreferenceGroup -> {
                     if (!preference.visible) return@fastForEachIndexed
 
-                    item {
-                        Column {
-                            PreferenceGroupHeader(
-                                title = preference.title,
-                                highlighted = preference.title == highlightKey,
-                            )
+                    if (preference.title.isNotBlank()) {
+                        item {
+                            VmhSectionHeader(preference.title)
                         }
                     }
-                    items(preference.preferenceItems) { item ->
-                        PreferenceItem(
-                            item = item,
-                            highlightKey = highlightKey,
-                        )
-                    }
                     item {
-                        if (i < items.lastIndex) {
-                            Spacer(modifier = Modifier.height(12.dp))
+                        VmhSettingsCardColumn {
+                            preference.preferenceItems.forEach { item ->
+                                PreferenceItem(
+                                    item = item,
+                                    highlightKey = highlightKey,
+                                )
+                            }
+                        }
+                    }
+                    if (i < items.lastIndex) {
+                        item {
+                            Spacer(modifier = Modifier.height(4.dp))
                         }
                     }
                 }

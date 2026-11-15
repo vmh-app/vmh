@@ -6,25 +6,23 @@ import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MultiChoiceSegmentedButtonRow
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -44,8 +43,6 @@ import eu.kanade.presentation.more.settings.Preference
 import eu.kanade.presentation.more.settings.screen.data.CreateBackupScreen
 import eu.kanade.presentation.more.settings.screen.data.RestoreBackupScreen
 import eu.kanade.presentation.more.settings.screen.data.StorageInfo
-import eu.kanade.presentation.more.settings.widget.BasePreferenceWidget
-import eu.kanade.presentation.more.settings.widget.PrefsHorizontalPadding
 import eu.kanade.presentation.util.relativeTimeSpanString
 import eu.kanade.tachiyomi.data.backup.create.BackupCreateWorker
 import eu.kanade.tachiyomi.data.backup.restore.BackupRestoreWorker
@@ -73,8 +70,8 @@ import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.collectAsState
 
 object SettingsDataScreen : SearchableSettings {
-
     val restorePreferenceKeyString = MR.strings.label_backup
+
     const val HELP_URL = "https://mihon.app/docs/faq/storage"
 
     @ReadOnlyComposable
@@ -99,10 +96,8 @@ object SettingsDataScreen : SearchableSettings {
         val storagePreferences = remember { context.appGraph.storagePreferences }
 
         return listOf(
-            getStorageLocationPref(storagePreferences = storagePreferences),
-            Preference.PreferenceItem.InfoPreference(stringResource(MR.strings.pref_storage_location_info)),
-
-            getBackupAndRestoreGroup(backupPreferences = backupPreferences),
+            getStorageLocationPref(storagePreferences),
+            getBackupAndRestoreGroup(backupPreferences),
             getDataGroup(),
             getExportGroup(),
         )
@@ -121,11 +116,6 @@ object SettingsDataScreen : SearchableSettings {
                 val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 
-                // For some reason InkBook devices do not implement the SAF properly. Persistable URI grants do not
-                // work. However, simply retrieving the URI and using it works fine for these devices. Access is not
-                // revoked after the app is closed or the device is restarted.
-                // This also holds for some Samsung devices. Thus, we simply execute inside of a try-catch block and
-                // ignore the exception if it is thrown.
                 try {
                     context.contentResolver.takePersistableUriPermission(uri, flags)
                 } catch (e: SecurityException) {
@@ -158,197 +148,225 @@ object SettingsDataScreen : SearchableSettings {
     }
 
     @Composable
-    private fun getStorageLocationPref(
-        storagePreferences: StoragePreferences,
-    ): Preference.PreferenceItem.TextPreference {
-        val context = LocalContext.current
+    private fun getStorageLocationPref(storagePreferences: StoragePreferences): Preference {
+        val ctx = LocalContext.current
         val pickStorageLocation = storageLocationPicker(storagePreferences.baseStorageDirectory)
+        val errPicker = stringResource(MR.strings.file_picker_error)
 
-        return Preference.PreferenceItem.TextPreference(
+        return Preference.PreferenceItem.CustomPreference(
             title = stringResource(MR.strings.pref_storage_location),
-            subtitle = storageLocationText(storagePreferences.baseStorageDirectory),
-            onClick = {
-                try {
-                    pickStorageLocation.launch(null)
-                } catch (e: ActivityNotFoundException) {
-                    context.toast(MR.strings.file_picker_error)
+        ) {
+            Column {
+                VmhSectionHeader(stringResource(MR.strings.pref_storage_location))
+                VmhSettingsCard {
+                    VmhTextPreference(
+                        title = stringResource(MR.strings.pref_storage_location),
+                        subtitle = storageLocationText(storagePreferences.baseStorageDirectory),
+                        onClick = {
+                            try {
+                                pickStorageLocation.launch(null)
+                            } catch (e: ActivityNotFoundException) {
+                                ctx.toast(errPicker)
+                            }
+                        },
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 14.dp),
+                    ) {
+                        Text(
+                            text = stringResource(MR.strings.pref_storage_location_info),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
-            },
-        )
+            }
+        }
     }
 
     @Composable
-    private fun getBackupAndRestoreGroup(backupPreferences: BackupPreferences): Preference.PreferenceGroup {
-        val context = LocalContext.current
+    private fun getBackupAndRestoreGroup(backupPreferences: BackupPreferences): Preference {
+        val ctx = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
+        var listDialog by remember { mutableStateOf<ListDialogData<Any>?>(null) }
+
+        fun <T> openListDialog(title: String, entries: Map<T, String>, selected: T, onSelect: (T) -> Unit) {
+            listDialog = ListDialogData(title, entries as Map<Any, String>, selected as Any) { onSelect(it as T) }
+        }
 
         val lastAutoBackup by backupPreferences.lastAutoBackupTimestamp.collectAsState()
+        val backupInterval by backupPreferences.backupInterval.collectAsState()
 
-        val chooseBackup = rememberLauncherForActivityResult(
-            ActivityResultContracts.OpenDocument(),
-        ) {
+        val errNullUri = stringResource(MR.strings.file_null_uri_error)
+        val chooseBackup = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {
             if (it == null) {
-                context.toast(MR.strings.file_null_uri_error)
+                ctx.toast(errNullUri)
                 return@rememberLauncherForActivityResult
             }
-
             try {
-                context.contentResolver.takePersistableUriPermission(
-                    it,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
-                )
+                ctx.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } catch (e: SecurityException) {
                 logcat(LogPriority.ERROR, e)
             }
-
             navigator.push(RestoreBackupScreen(it.toString()))
         }
 
-        return Preference.PreferenceGroup(
-            title = stringResource(MR.strings.label_backup),
-            preferenceItems = listOf(
-                // Manual actions
-                Preference.PreferenceItem.CustomPreference(
-                    title = stringResource(restorePreferenceKeyString),
-                ) {
-                    BasePreferenceWidget(
-                        subcomponent = {
-                            MultiChoiceSegmentedButtonRow(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(intrinsicSize = IntrinsicSize.Min)
-                                    .padding(horizontal = PrefsHorizontalPadding),
-                            ) {
-                                SegmentedButton(
-                                    modifier = Modifier.fillMaxHeight(),
-                                    checked = false,
-                                    onCheckedChange = { navigator.push(CreateBackupScreen()) },
-                                    shape = SegmentedButtonDefaults.itemShape(0, 2),
-                                ) {
-                                    Text(stringResource(MR.strings.pref_create_backup))
-                                }
-                                SegmentedButton(
-                                    modifier = Modifier.fillMaxHeight(),
-                                    checked = false,
-                                    onCheckedChange = {
-                                        scope.launch {
-                                            if (!BackupRestoreWorker.isRunning(context.workManager)) {
-                                                if (DeviceUtil.isMiui && DeviceUtil.isMiuiOptimizationDisabled()) {
-                                                    context.toast(MR.strings.restore_miui_warning)
-                                                }
-                                                chooseBackup.launch(arrayOf("*/*"))
-                                            } else {
-                                                context.toast(MR.strings.restore_in_progress)
-                                            }
-                                        }
-                                    },
-                                    shape = SegmentedButtonDefaults.itemShape(1, 2),
-                                ) {
-                                    Text(stringResource(MR.strings.pref_restore_backup))
+        val warnMiui = stringResource(MR.strings.restore_miui_warning)
+        val warnProgress = stringResource(MR.strings.restore_in_progress)
+
+        val intervalOptions = mapOf(
+            0 to stringResource(MR.strings.off),
+            6 to stringResource(MR.strings.update_6hour),
+            12 to stringResource(MR.strings.update_12hour),
+            24 to stringResource(MR.strings.update_24hour),
+            48 to stringResource(MR.strings.update_48hour),
+            168 to stringResource(MR.strings.update_weekly),
+        )
+        val titleBackupInterval = stringResource(MR.strings.pref_backup_interval)
+
+        return Preference.PreferenceItem.CustomPreference(title = stringResource(MR.strings.label_backup)) {
+            Column {
+                VmhSectionHeader(stringResource(MR.strings.label_backup))
+                VmhSettingsCard {
+                    VmhTextPreference(
+                        title = stringResource(MR.strings.pref_create_backup),
+                        onClick = { navigator.push(CreateBackupScreen()) },
+                    )
+                    DestructiveTextPreference(
+                        title = stringResource(MR.strings.pref_restore_backup),
+                        onClick = {
+                            scope.launch {
+                                if (!BackupRestoreWorker.isRunning(ctx.workManager)) {
+                                    if (DeviceUtil.isMiui && DeviceUtil.isMiuiOptimizationDisabled()) {
+                                        ctx.toast(warnMiui)
+                                    }
+                                    chooseBackup.launch(arrayOf("*/*"))
+                                } else {
+                                    ctx.toast(warnProgress)
                                 }
                             }
                         },
                     )
-                },
+                    VmhTextPreference(
+                        title = titleBackupInterval,
+                        subtitle = intervalOptions[backupInterval] ?: "",
+                        onClick = {
+                            openListDialog(
+                                title = titleBackupInterval,
+                                entries = intervalOptions,
+                                selected = backupInterval,
+                                onSelect = {
+                                    backupPreferences.backupInterval.set(it)
+                                    BackupCreateWorker.setupTask(ctx, it)
+                                },
+                            )
+                        },
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 14.dp),
+                    ) {
+                        val autoInfo =
+                            stringResource(MR.strings.last_auto_backup_info, relativeTimeSpanString(lastAutoBackup))
+                        Text(
+                            text = stringResource(MR.strings.backup_info) + "\n\n" + autoInfo,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
 
-                // Automatic backups
-                Preference.PreferenceItem.ListPreference(
-                    preference = backupPreferences.backupInterval,
-                    entries = mapOf(
-                        0 to stringResource(MR.strings.off),
-                        6 to stringResource(MR.strings.update_6hour),
-                        12 to stringResource(MR.strings.update_12hour),
-                        24 to stringResource(MR.strings.update_24hour),
-                        48 to stringResource(MR.strings.update_48hour),
-                        168 to stringResource(MR.strings.update_weekly),
-                    ),
-                    title = stringResource(MR.strings.pref_backup_interval),
-                    onValueChanged = {
-                        BackupCreateWorker.setupTask(context, it)
-                        true
-                    },
-                ),
-                Preference.PreferenceItem.InfoPreference(
-                    stringResource(MR.strings.backup_info) + "\n\n" +
-                        stringResource(MR.strings.last_auto_backup_info, relativeTimeSpanString(lastAutoBackup)),
-                ),
-            ),
-        )
+                listDialog?.let { data ->
+                    VmhListDialog(
+                        title = data.title,
+                        entries = data.entries,
+                        selectedValue = data.selectedValue,
+                        onSelect = {
+                            data.onSelect(it)
+                            listDialog = null
+                        },
+                        onDismiss = { listDialog = null },
+                    )
+                }
+            }
+        }
     }
 
     @Composable
-    private fun getDataGroup(): Preference.PreferenceGroup {
-        val context = LocalContext.current
+    private fun getDataGroup(): Preference {
+        val ctx = LocalContext.current
         val scope = rememberCoroutineScope()
-        val libraryPreferences = remember { context.appGraph.libraryPreferences }
+        val libraryPreferences = remember { ctx.appGraph.libraryPreferences }
+        val autoClearChapterCache by libraryPreferences.autoClearChapterCache.collectAsState()
+        val chapterCache = remember { ctx.appGraph.chapterCache }
 
-        val chapterCache = remember { context.appGraph.chapterCache }
         var cacheReadableSizeSema by remember { mutableIntStateOf(0) }
         val cacheReadableSize by produceState("", cacheReadableSizeSema) {
             value = chapterCache.readableSize()
         }
+        val msgError = stringResource(MR.strings.cache_delete_error)
+        val isWide = LocalContext.current.resources.configuration.screenWidthDp > 500
 
-        return Preference.PreferenceGroup(
-            title = stringResource(MR.strings.pref_storage_usage),
-            preferenceItems = listOf(
-                Preference.PreferenceItem.CustomPreference(
-                    title = stringResource(MR.strings.pref_storage_usage),
-                ) {
-                    BasePreferenceWidget(
-                        subcomponent = {
-                            StorageInfo(
-                                modifier = Modifier.padding(horizontal = PrefsHorizontalPadding),
-                            )
+        return Preference.PreferenceItem.CustomPreference(title = stringResource(MR.strings.pref_storage_usage)) {
+            Column {
+                VmhSectionHeader(stringResource(MR.strings.pref_storage_usage))
+                VmhSettingsCard {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(if (isWide) 0.5f else 1f)
+                            .padding(horizontal = 20.dp, vertical = 14.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    ) {
+                        StorageInfo()
+                    }
+                    DestructiveTextPreference(
+                        title = stringResource(MR.strings.pref_clear_chapter_cache),
+                        subtitle = cacheReadableSize,
+                        onClick = {
+                            scope.launch {
+                                try {
+                                    val deletedFiles = chapterCache.clear()
+                                    ctx.toast(ctx.stringResource(MR.strings.cache_deleted, deletedFiles))
+                                    cacheReadableSizeSema++
+                                } catch (e: Exception) {
+                                    if (e is CancellationException) throw e
+                                    logcat(LogPriority.ERROR, e)
+                                    ctx.toast(msgError)
+                                }
+                            }
                         },
                     )
-                },
-
-                Preference.PreferenceItem.TextPreference(
-                    title = stringResource(MR.strings.pref_clear_chapter_cache),
-                    subtitle = stringResource(MR.strings.used_cache, cacheReadableSize),
-                    onClick = {
-                        scope.launch {
-                            try {
-                                val deletedFiles = chapterCache.clear()
-                                context.toast(context.stringResource(MR.strings.cache_deleted, deletedFiles))
-                                cacheReadableSizeSema++
-                            } catch (e: Exception) {
-                                if (e is CancellationException) throw e
-                                logcat(LogPriority.ERROR, e)
-                                context.toast(MR.strings.cache_delete_error)
-                            }
-                        }
-                    },
-                ),
-                Preference.PreferenceItem.SwitchPreference(
-                    preference = libraryPreferences.autoClearChapterCache,
-                    title = stringResource(MR.strings.pref_auto_clear_chapter_cache),
-                ),
-            ),
-        )
+                    VmhSwitchPreference(
+                        title = stringResource(MR.strings.pref_auto_clear_chapter_cache),
+                        checked = autoClearChapterCache,
+                        onCheckedChange = { libraryPreferences.autoClearChapterCache.set(it) },
+                    )
+                }
+            }
+        }
     }
 
     @Composable
-    private fun getExportGroup(): Preference.PreferenceGroup {
+    private fun getExportGroup(): Preference {
         var showDialog by remember { mutableStateOf(false) }
         var exportOptions by remember {
-            mutableStateOf(
-                ExportOptions(
-                    includeTitle = true,
-                    includeAuthor = true,
-                    includeArtist = true,
-                ),
-            )
+            mutableStateOf(ExportOptions(includeTitle = true, includeAuthor = true, includeArtist = true))
         }
 
-        val context = LocalContext.current
+        val ctx = LocalContext.current
         val scope = rememberCoroutineScope()
-        val getFavorites = remember { context.appGraph.getFavorites }
+        val getFavorites = remember { ctx.appGraph.getFavorites }
         var favorites by remember { mutableStateOf<List<Manga>>(emptyList()) }
         LaunchedEffect(Unit) {
             favorites = getFavorites.await()
         }
+        val msgExported = stringResource(MR.strings.library_exported)
 
         val saveFileLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.CreateDocument("text/csv"),
@@ -356,13 +374,13 @@ object SettingsDataScreen : SearchableSettings {
             uri?.let {
                 scope.launch {
                     LibraryExporter.exportToCsv(
-                        context = context,
+                        context = ctx,
                         uri = it,
                         favorites = favorites,
                         options = exportOptions,
                         onExportComplete = {
                             scope.launch(Dispatchers.Main) {
-                                context.toast(MR.strings.library_exported)
+                                ctx.toast(msgExported)
                             }
                         },
                     )
@@ -370,26 +388,28 @@ object SettingsDataScreen : SearchableSettings {
             }
         }
 
-        if (showDialog) {
-            ColumnSelectionDialog(
-                options = exportOptions,
-                onConfirm = { options ->
-                    exportOptions = options
-                    saveFileLauncher.launch("mihon_library.csv")
-                },
-                onDismissRequest = { showDialog = false },
-            )
-        }
+        return Preference.PreferenceItem.CustomPreference(title = stringResource(MR.strings.export)) {
+            Column {
+                VmhSectionHeader(stringResource(MR.strings.export))
+                VmhSettingsCard {
+                    VmhTextPreference(
+                        title = stringResource(MR.strings.library_list),
+                        onClick = { showDialog = true },
+                    )
+                }
+            }
 
-        return Preference.PreferenceGroup(
-            title = stringResource(MR.strings.export),
-            preferenceItems = listOf(
-                Preference.PreferenceItem.TextPreference(
-                    title = stringResource(MR.strings.library_list),
-                    onClick = { showDialog = true },
-                ),
-            ),
-        )
+            if (showDialog) {
+                ColumnSelectionDialog(
+                    options = exportOptions,
+                    onConfirm = { options ->
+                        exportOptions = options
+                        saveFileLauncher.launch("mihon_library.csv")
+                    },
+                    onDismissRequest = { showDialog = false },
+                )
+            }
+        }
     }
 
     @Composable
@@ -404,9 +424,7 @@ object SettingsDataScreen : SearchableSettings {
 
         AlertDialog(
             onDismissRequest = onDismissRequest,
-            title = {
-                Text(text = stringResource(MR.strings.migration_dialog_what_to_include))
-            },
+            title = { Text(text = stringResource(MR.strings.migration_dialog_what_to_include)) },
             text = {
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -419,6 +437,7 @@ object SettingsDataScreen : SearchableSettings {
                                     artistSelected = false
                                 }
                             },
+                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary),
                         )
                         Text(text = stringResource(MR.strings.title))
                     }
@@ -428,6 +447,7 @@ object SettingsDataScreen : SearchableSettings {
                             checked = authorSelected,
                             onCheckedChange = { authorSelected = it },
                             enabled = titleSelected,
+                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary),
                         )
                         Text(text = stringResource(MR.strings.author))
                     }
@@ -437,6 +457,7 @@ object SettingsDataScreen : SearchableSettings {
                             checked = artistSelected,
                             onCheckedChange = { artistSelected = it },
                             enabled = titleSelected,
+                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary),
                         )
                         Text(text = stringResource(MR.strings.artist))
                     }
@@ -455,14 +476,41 @@ object SettingsDataScreen : SearchableSettings {
                         onDismissRequest()
                     },
                 ) {
-                    Text(text = stringResource(MR.strings.action_save))
+                    Text(text = stringResource(MR.strings.action_save), color = MaterialTheme.colorScheme.primary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismissRequest) {
-                    Text(text = stringResource(MR.strings.action_cancel))
+                    Text(text = stringResource(MR.strings.action_cancel), color = MaterialTheme.colorScheme.error)
                 }
             },
         )
+    }
+
+    @Composable
+    private fun DestructiveTextPreference(
+        title: String,
+        subtitle: String? = null,
+        onClick: () -> Unit,
+    ) {
+        val isWide = LocalContext.current.resources.configuration.screenWidthDp > 500
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(if (isWide) 0.5f else 1f)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 20.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error)
+                if (!subtitle.isNullOrEmpty()) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
+                    )
+                }
+            }
+        }
     }
 }
