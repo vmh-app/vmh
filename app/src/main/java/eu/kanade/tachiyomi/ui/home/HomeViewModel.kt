@@ -15,11 +15,16 @@ import eu.kanade.tachiyomi.source.model.FilterList
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.online.HttpSource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -78,24 +83,30 @@ class HomeViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val history: StateFlow<List<HomeHistoryItem>> = combine(
-        getHistory.subscribe("").map { it.take(10) },
+        getHistory.subscribe(""),
         getLibraryManga.subscribe(),
     ) { historyList, libraryList ->
-        historyList.map { hist ->
-            val libManga = libraryList.find { it.manga.id == hist.mangaId }
-            val progress = if (libManga != null && libManga.totalChapters > 0) {
-                (libManga.readCount.toFloat() / libManga.totalChapters.toFloat()).coerceIn(0f, 1f)
-            } else {
-                null
-            }
+        val libraryById = libraryList.associateBy { it.manga.id }
+        historyList.asSequence()
+            .filter { it.mangaId in libraryById }
+            .distinctBy { it.mangaId }
+            .take(HISTORY_ITEM_LIMIT)
+            .map { hist ->
+                val libManga = libraryById.getValue(hist.mangaId)
+                val progress = if (libManga.totalChapters > 0) {
+                    (libManga.readCount.toFloat() / libManga.totalChapters.toFloat()).coerceIn(0f, 1f)
+                } else {
+                    null
+                }
 
-            HomeHistoryItem(
-                history = hist,
-                progress = progress,
-                sourceId = libManga?.manga?.source ?: 0L,
-                favorite = libManga?.manga?.favorite ?: false,
-            )
-        }
+                HomeHistoryItem(
+                    history = hist,
+                    progress = progress,
+                    sourceId = libManga.manga.source,
+                    favorite = true,
+                )
+            }
+            .toList()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _genreSamples = MutableStateFlow<List<HomeGenreSample>>(emptyList())
@@ -126,6 +137,32 @@ class HomeViewModel(
     val hero: StateFlow<HomeHeroState> = _hero.asStateFlow()
     private var heroLoadedAt: Instant? = null
     private var heroLoading = false
+    private var heroAttempts = 0
+
+    init {
+        // El banner y los generos dependen de las fuentes que tengan mangas guardados. Al
+        // instalar una fuente y guardar una obra, la biblioteca cambia y aqui se recargan sin
+        // tener que cerrar la app.
+        viewModelScope.launch {
+            getLibraryManga.subscribe()
+                .map { library ->
+                    library.asSequence()
+                        .map { it.manga.source }
+                        .distinct()
+                        .sorted()
+                        .toList()
+                }
+                .distinctUntilChanged()
+                .collect { sources ->
+                    if (sources.isEmpty()) return@collect
+                    if (_hero.value.items.isEmpty()) {
+                        delay(HOME_RETRY_DELAY_MILLIS)
+                        refreshHero(force = true)
+                    }
+                    if (_genreSamples.value.isEmpty()) refreshGenreSamples(force = true)
+                }
+        }
+    }
 
     fun refreshHero(force: Boolean = false) {
         val loadedAt = heroLoadedAt
@@ -134,11 +171,21 @@ class HomeViewModel(
         heroLoading = true
         viewModelScope.launch {
             val loaded = runCatching { loadHero() }.getOrNull()
-            if (loaded != null) {
+            // Un Inicio sin banner no se memoriza: si la fuente tardo o fallo, se reintenta en
+            // vez de quedarse vacio hasta reiniciar la app.
+            if (loaded != null && loaded.items.isNotEmpty()) {
                 _hero.value = loaded
                 heroLoadedAt = Clock.System.now()
+                heroAttempts = 0
+                heroLoading = false
+                return@launch
             }
             heroLoading = false
+            if (heroAttempts < HERO_MAX_ATTEMPTS) {
+                heroAttempts++
+                delay(HERO_RETRY_MILLIS)
+                refreshHero(force = true)
+            }
         }
     }
 
@@ -177,35 +224,49 @@ class HomeViewModel(
         val source = mostUsedOnlineSource() ?: return@withContext emptyList()
         val genres = runCatching { genreNames(source) }.getOrDefault(emptyList())
         val showNsfw = ContentWarning.NSFW in sourcePreferences.enabledContentWarnings.get()
-        val seen = mutableSetOf<String>()
 
-        genres.take(GENRE_SAMPLE_LIMIT).mapNotNull { genre ->
-            val filters = buildGenreFilters(source, genre) ?: return@mapNotNull null
-            val page = runCatching { source.getSearchManga(1, "", filters) }.getOrNull()
-                ?: return@mapNotNull null
-
-            val mangas = page.mangas
-                .filter { it.title.isNotBlank() }
-                .filter { showNsfw || !hasAdultGenre(it) }
-                .filter { seen.add(it.url) }
-                .take(GENRE_SAMPLE_COUNT)
-                .map { it.toDomainManga(source.id) }
-            if (mangas.isEmpty()) return@mapNotNull null
-
-            val resolved = runCatching { networkToLocalManga(mangas) }.getOrDefault(emptyList())
-            if (resolved.isEmpty()) return@mapNotNull null
-
-            HomeGenreSample(
-                genre = genre,
-                items = resolved.map { manga ->
-                    HomeHeroItem(
-                        mangaId = manga.id,
-                        title = manga.title,
-                        coverData = manga.asMangaCover(),
-                    )
-                },
-            )
+        // Los generos se piden a la vez: en serie el Inicio tardaba 10-15 s en mostrar portadas.
+        val samples = coroutineScope {
+            genres.take(GENRE_SAMPLE_LIMIT)
+                .map { genre -> async { loadGenreSample(source, genre, showNsfw) } }
+                .awaitAll()
         }
+
+        val seen = mutableSetOf<Long>()
+        samples.filterNotNull().mapNotNull { sample ->
+            val items = sample.items.filter { seen.add(it.mangaId) }
+            if (items.isEmpty()) null else sample.copy(items = items)
+        }
+    }
+
+    private suspend fun loadGenreSample(
+        source: Source,
+        genre: String,
+        showNsfw: Boolean,
+    ): HomeGenreSample? {
+        val filters = buildGenreFilters(source, genre) ?: return null
+        val page = runCatching { source.getSearchManga(1, "", filters) }.getOrNull() ?: return null
+
+        val mangas = page.mangas
+            .filter { it.title.isNotBlank() }
+            .filter { showNsfw || !hasAdultGenre(it) }
+            .take(GENRE_SAMPLE_COUNT)
+            .map { it.toDomainManga(source.id) }
+        if (mangas.isEmpty()) return null
+
+        val resolved = runCatching { networkToLocalManga(mangas) }.getOrDefault(emptyList())
+        if (resolved.isEmpty()) return null
+
+        return HomeGenreSample(
+            genre = genre,
+            items = resolved.map { manga ->
+                HomeHeroItem(
+                    mangaId = manga.id,
+                    title = manga.title,
+                    coverData = manga.asMangaCover(),
+                )
+            },
+        )
     }
 
     /** Aplica el genero sobre una copia nueva de los filtros, igual que la pantalla de fuentes. */
@@ -278,11 +339,15 @@ class HomeViewModel(
         return getNextChapters.await(mangaId, chapterId, onlyUnread = false).firstOrNull()
     }
 
-    private companion object {
+    companion object {
         const val HERO_ITEM_COUNT = 6
         const val SOURCE_GENRE_COUNT = 12
         const val GENRE_SAMPLE_LIMIT = 6
         const val GENRE_SAMPLE_COUNT = 3
+        const val HISTORY_ITEM_LIMIT = 5
+        const val HOME_RETRY_DELAY_MILLIS = 1500L
+        const val HERO_MAX_ATTEMPTS = 2
+        const val HERO_RETRY_MILLIS = 6000L
         val HERO_CACHE_TTL = 30.minutes
     }
 }
