@@ -128,7 +128,7 @@ class LibraryUpdateWorker(private val context: Context, workerParams: WorkerPara
         libraryPreferences.lastUpdatedTimestamp.set(Clock.System.now().toEpochMilliseconds())
 
         val categoryId = inputData.getLong(KEY_CATEGORY, -1L)
-        addMangaToQueue(categoryId)
+        addMangaToQueue(categoryId, manual = inputData.getBoolean(KEY_MANUAL, false))
 
         return withContext(Dispatchers.IO) {
             try {
@@ -164,8 +164,9 @@ class LibraryUpdateWorker(private val context: Context, workerParams: WorkerPara
      * Adds list of manga to be updated.
      *
      * @param categoryId the ID of the category to update, or -1 if no category specified.
+     * @param manual whether the user triggered this run, which lifts the smart update restrictions.
      */
-    private suspend fun addMangaToQueue(categoryId: Long) {
+    private suspend fun addMangaToQueue(categoryId: Long, manual: Boolean) {
         val libraryManga = getLibraryManga.await()
 
         val listToUpdate = if (categoryId != -1L) {
@@ -198,6 +199,10 @@ class LibraryUpdateWorker(private val context: Context, workerParams: WorkerPara
                         )
                         false
                     }
+
+                    // Smart update restrictions only guard scheduled runs; a manual refresh updates
+                    // what the user selected.
+                    manual -> true
 
                     MANGA_NON_COMPLETED in restrictions && it.manga.status.toInt() == SManga.COMPLETED -> {
                         skippedUpdates.add(it.manga to context.stringResource(MR.strings.skipped_reason_completed))
@@ -438,6 +443,11 @@ class LibraryUpdateWorker(private val context: Context, workerParams: WorkerPara
          */
         private const val KEY_CATEGORY = "category"
 
+        /**
+         * Key for whether the run was started by the user.
+         */
+        private const val KEY_MANUAL = "manual"
+
         fun setupTask(
             context: Context,
             prefInterval: Int? = null,
@@ -501,6 +511,7 @@ class LibraryUpdateWorker(private val context: Context, workerParams: WorkerPara
 
             val inputData = workDataOf(
                 KEY_CATEGORY to category?.id,
+                KEY_MANUAL to true,
             )
             val request = OneTimeWorkRequestBuilder<LibraryUpdateWorker>()
                 .addTag(TAG)
